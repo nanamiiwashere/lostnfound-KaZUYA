@@ -2,7 +2,7 @@
 
 session_start();
 require_once '../connect.php';
-require_once '../auth3thparty.php';
+require_once '../Auth/auth3thparty.php';
 
 $code  = $_GET['code'] ?? '';
 if (!$code) {
@@ -19,7 +19,7 @@ $tokenResponse = file_get_contents('https://discord.com/api/oauth2/token', false
         'client_secret' => DISCORD_CLIENT_SECRET,
         'grant_type' => 'authorization_code',
         'code' => $code,
-        'redirect_uri' => DISCORD_REDIRECT_URL
+        'redirect_url' => DISCORD_REDIRECT_URL
         ]),
     ]])
 );
@@ -32,7 +32,7 @@ if (empty($token['access_token'])){
 
 $userResponse = file_get_contents('https://discord.com/api/users/@me', false, stream_context_create(['http' => [
     'method' => 'GET',
-    'header' => "Authorization: Bearer {$token['access_token']}\r\n",
+    'header' => "Authorization: Bearer {$token['access_token']}\r\n"
     ]])
 );
 
@@ -49,6 +49,26 @@ $avatar = $discordUser['avatar']
 
 $name  = $discordUser['global_name'] ?? $discordUser['username'];
 
-$stmt = $pdo
+$stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+$stmt -> execute([$discordUser[$email]]);
+$user = $stmt -> fetch();
 
+if (!user){
+    $stmt = $pdo -> prepare(
+        "INSERT INTO users (nama, email, avatar, oauth_provider, oauth_uid)
+        VALUES (?, ?, ?, 'discord', ?)"
+    );
+
+    $stmt -> execute([$name, $discordUser['email'], $avatar, $discordUser['id']]);
+    $stmt = $pdo -> prepare("SELECT * FROM users WHERE id_user = ?");
+    $stmt -> execute([$pdo -> lastInsertId()]);
+    $user = $stmt -> fetch();
+} else {
+    $pdo -> prepare("UPDATE users SET avatar = ?, oauth_provider = ?, WHERE id_user = ?")
+         -> execute([$avatar, $discordUser['id'], $user['id_user']]);
+}
+
+loginUser($user);
+header('Location: ../dashboard/index.php');
+exit;
 ?>
