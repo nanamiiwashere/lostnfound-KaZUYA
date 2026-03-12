@@ -43,26 +43,52 @@ if (empty($googleUser['email'])){
     exit;
 }
 
-$stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-$stmt -> execute([$googleUser[$email]]);
-$user = $stmt -> fetch();
+$stmt = $pdo->prepare("
+    SELECT * FROM users 
+    WHERE oauth_uid = ? AND oauth_provider = 'google'");
+stmt->execute([$googleUser['id']]);
+$user = $stmt->fetch();
 
-if (!user){
-    $stmt = $pdo -> prepare(
-        "INSERT INTO users (nama, email, avatar, oauth_provider, oauth_uid)
-        VALUES (?, ?, ?, 'google', ?)"
-    );
 
-    $stmt -> execute([$googleUser['email'], $googleUser['email'], $googleUser['picture'] ?? null, $googleUser['id']]);
-    $stmt = $pdo -> prepare("SELECT * FROM users WHERE id_user = ?");
-    $stmt -> execute([$pdo -> lastInsertId()]);
-    $user = $stmt -> fetch();
-} else {
-    $pdo -> prepare("UPDATE users SET avatar = ?, oauth_provider = ?, WHERE id_user = ?")
-         -> execute([$googleUser['picture'] ?? null, $googleUser['id'], $user['id_user']]);
+if (!$user) {
+    // Ga ketemu by oauth_uid → cek by email
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->execute([$googleUser['email']]);  // ← ['email'] bukan [$email]
+    $user = $stmt->fetch();
+
+    if ($user) {
+        $pdo->prepare("
+            UPDATE users 
+            SET avatar = ?, oauth_provider = 'google', oauth_uid = ?
+            WHERE id_user = ?
+        ")->execute([
+            $googleUser['picture'] ?? null,
+            $googleUser['id'],
+            $user['id_user'],
+        ]);
+
+    } else {
+        $pdo->prepare("
+            INSERT INTO users (nama, email, avatar, oauth_provider, oauth_uid, role)
+            VALUES (?, ?, ?, 'google', ?, 'user')
+        ")->execute([
+            $googleUser['name'],
+            $googleUser['email'],
+            $googleUser['picture'] ?? null,
+            $googleUser['id'],
+        ]);
+    }
+
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->execute([$googleUser['email']]);
+    $user = $stmt->fetch();
+}
+
+if (!$user){
+    header('Location: ' . APP_URL . 'login.php?error=user_not_found');
+    exit();
 }
 
 loginUser($user);
 header('Location: ../dashboard/index.php');
-exit;
-?>
+exit();

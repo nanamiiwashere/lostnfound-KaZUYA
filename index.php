@@ -1,12 +1,13 @@
 <?php
 require_once './connect.php';
-require_once './auth3thparty.php';
+require_once './Auth/auth3thparty.php';
 require_once './core/envPrivilege.php';
 
 $stmt = $pdo->query("SELECT * FROM barang_temuan WHERE status='open' ORDER BY created_at DESC LIMIT 8");
-$items = $stmt->fetchAll();
+$barang_temuan = $stmt->fetchAll();
 
-// Fetch news
+
+// Fetch News 
 $news = $pdo->query("SELECT * FROM news ORDER BY created_at DESC LIMIT 3")->fetchAll();
 
 // Stats
@@ -14,12 +15,13 @@ $totalLost  = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE type='lost'"
 $totalFound = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE type='found'")->fetchColumn();
 $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='resolved'")->fetchColumn();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FindIt — Lost & Found Community</title>
+  <title>LostnFound - Commuterlink Nusantara</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
@@ -31,7 +33,7 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
 <!-- ══ NAVBAR ══ -->
 <nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
   <div class="container">
-    <a class="navbar-brand" href="<?= APP_URL ?>index.php">Find<span class="accent">It</span></a>
+    <a class="navbar-brand" href="<?= APP_URL ?>index.php">Lostn<span class="accent">Found</span></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
       <i class="fas fa-bars" style="color:#e2e8f0;"></i>
     </button>
@@ -45,7 +47,7 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
       <div class="d-flex align-items-center gap-2">
         <?php if (isLoggedIn()):
               $u = currentUser(); ?>
-          <!-- ✅ Logged in nav -->
+          <!-- navbar klo login -->
           <a href="post-item.php" class="btn-nav-accent"><i class="fas fa-plus me-1"></i>Post Item</a>
           <div class="dropdown">
             <button class="btn-avatar dropdown-toggle" data-bs-toggle="dropdown">
@@ -73,7 +75,7 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
           </div>
 
         <?php else: ?>
-          <!-- 🔒 Guest nav -->
+          <!-- navbar guest-->
           <a href="auth/login.php"    class="btn-nav-ghost">Login</a>
           <a href="auth/register.php" class="btn-nav-accent">Register</a>
         <?php endif; ?>
@@ -89,15 +91,15 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
       <div class="col-lg-6">
         <div class="hero-tag mb-4">
           <span style="width:6px;height:6px;background:var(--accent);border-radius:50%;display:inline-block;"></span>
-          Community Lost &amp; Found Platform
+          Pengaduan barang hilang krl commuterlink nusantara
         </div>
         <h1 class="hero-title mb-4">
           Lost something?<br/><span class="accent">We'll find it.</span>
         </h1>
         <p class="hero-sub mb-5">
-          Browse lost and found items from your community.
+          Cari barang hilang & temuan dari stasiun KRL.
           <?php if (!isLoggedIn()): ?>
-            Register free to report items or contact our staff.
+            Daftar gratis untuk lapor atau hubungi petugas.
           <?php else: ?>
             Post an item or contact staff from your dashboard.
           <?php endif; ?>
@@ -105,7 +107,7 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
 
         <!-- Search — PUBLIC, everyone can use -->
         <div class="search-bar mb-4">
-          <input type="text" id="heroSearch" placeholder="Search lost keys, wallets, pets..."/>
+          <input type="text" id="heroSearch" placeholder="Cari kehilangan kunci, dompet, kartu ..."/>
           <button onclick="location.href='items.php?q='+document.getElementById('heroSearch').value">
             <i class="fas fa-search"></i>
           </button>
@@ -114,11 +116,11 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
         <!-- CTA — changes based on login state -->
         <div class="d-flex flex-wrap gap-3">
           <?php if (isLoggedIn()): ?>
-            <!-- ✅ Logged in: can post -->
+            <!-- Logged in: can post -->
             <a href="post-item.php"         class="btn-primary-custom"><i class="fas fa-plus-circle"></i> Report Item</a>
             <a href="items.php?type=found"  class="btn-ghost-custom"><i class="fas fa-hand-holding"></i> Found Items</a>
           <?php else: ?>
-            <!-- 🔒 Guest: explore only, nudge to register -->
+            <!-- Guest: explore only, nudge to register -->
             <a href="items.php"             class="btn-primary-custom"><i class="fas fa-search"></i> Explore Items</a>
             <a href="auth/register.php"     class="btn-ghost-custom"><i class="fas fa-user-plus"></i> Register to Post</a>
           <?php endif; ?>
@@ -182,23 +184,23 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
     <div class="row g-4" id="itemsGrid">
       <?php
       $demos = [
-        ['title'=>'Black Leather Wallet', 'type'=>'lost',  'location'=>'Central Park',      'category'=>'Accessories', 'image'=>null,'id'=>1],
-        ['title'=>'iPhone 15 Pro Max',    'type'=>'found', 'location'=>'Downtown Metro',    'category'=>'Electronics', 'image'=>null,'id'=>2],
-        ['title'=>'Golden Retriever',     'type'=>'lost',  'location'=>'Riverside Park',    'category'=>'Pets',        'image'=>null,'id'=>3],
-        ['title'=>'Blue Nike Backpack',   'type'=>'found', 'location'=>'City Library',      'category'=>'Bags',        'image'=>null,'id'=>4],
-        ['title'=>'Toyota Car Keys',      'type'=>'lost',  'location'=>'Mall Parking B2',   'category'=>'Keys',        'image'=>null,'id'=>5],
-        ['title'=>'Silver Bracelet',      'type'=>'found', 'location'=>'Beach Boardwalk',   'category'=>'Jewelry',     'image'=>null,'id'=>6],
-        ['title'=>'Student ID Card',      'type'=>'found', 'location'=>'Campus Cafeteria',  'category'=>'Documents',   'image'=>null,'id'=>7],
-        ['title'=>'Airpods Pro Case',     'type'=>'lost',  'location'=>'Coffee Shop',       'category'=>'Electronics', 'image'=>null,'id'=>8],
+        ['nama_barang'=>'Dompet Kulit Hitam',  'type'=>'lost',  'lokasi_ditemukan'=>'Taman Kota Blok M',       'category'=>'Accessories', 'image'=>null,'id_barang'=>1],
+        ['nama_barang'=>'iPhone 14 Pro',       'type'=>'found', 'lokasi_ditemukan'=>'Halte Busway Sudirman',   'category'=>'Electronics', 'image'=>null,'id_barang'=>2],
+        ['nama_barang'=>'Kucing Oranye Mochi', 'type'=>'lost',  'lokasi_ditemukan'=>'Bintaro Sektor 7',        'category'=>'Pets',        'image'=>null,'id_barang'=>3],
+        ['nama_barang'=>'Tas Ransel Eiger',    'type'=>'found', 'lokasi_ditemukan'=>'Perpustakaan Nasional',   'category'=>'Bags',        'image'=>null,'id_barang'=>4],
+        ['nama_barang'=>'Kunci Motor Yamaha',  'type'=>'lost',  'lokasi_ditemukan'=>'Parkiran Mall Senayan',   'category'=>'Keys',        'image'=>null,'id_barang'=>5],
+        ['nama_barang'=>'Gelang Perak',        'type'=>'found', 'lokasi_ditemukan'=>'Pantai Ancol',            'category'=>'Jewelry',     'image'=>null,'id_barang'=>6],
+        ['nama_barang'=>'Kartu Pelajar SMA',   'type'=>'found', 'lokasi_ditemukan'=>'Kantin Sekolah',          'category'=>'Documents',   'image'=>null,'id_barang'=>7],
+        ['nama_barang'=>'AirPods Pro Gen 2',   'type'=>'lost',  'lokasi_ditemukan'=>'Kopi Kenangan Sudirman',  'category'=>'Electronics', 'image'=>null,'id_barang'=>8],
       ];
-      $displayItems = empty($items) ? $demos : $items;
+      $displayItems = empty($barang_temuan) ? $demos : $barang_temuan;
       $catIcons = ['Electronics'=>'fa-mobile-alt','Accessories'=>'fa-wallet','Pets'=>'fa-paw','Bags'=>'fa-shopping-bag','Keys'=>'fa-key','Jewelry'=>'fa-gem','Documents'=>'fa-id-card','Other'=>'fa-box'];
 
       foreach($displayItems as $item):
         $icon = $catIcons[$item['category']] ?? 'fa-box';
       ?>
       <div class="col-sm-6 col-lg-3 item-col" data-type="<?= $item['type'] ?>">
-        <div class="item-card h-100" onclick="location.href='item-detail.php?id=<?= $item['id'] ?>'">
+        <div class="item-card h-100" onclick="location.href='item-detail.php?id=<?= $item['id_barang'] ?>'">
           <div class="item-card-img-wrap">
             <?php if (!empty($item['image'])): ?>
               <img src="uploads/<?= htmlspecialchars($item['image']) ?>" class="item-card-img" alt=""/>
@@ -211,30 +213,30 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
           </div>
 
           <div class="item-card-body">
-            <div class="item-cat"><?= htmlspecialchars($item['category']) ?></div>
-            <div class="item-title"><?= htmlspecialchars($item['title']) ?></div>
+            <div class="item-cat"><?= htmlspecialchars($item['category'] ?? 'Other') ?></div>
+            <div class="item-title"><?= htmlspecialchars($item['nama_barang']) ?></div>
             <div class="item-loc mb-3">
-              <i class="fas fa-map-marker-alt"></i><?= htmlspecialchars($item['location']) ?>
+              <i class="fas fa-map-marker-alt"></i><?= htmlspecialchars($item['lokasi_ditemukan']) ?>
             </div>
 
             <?php if (isLoggedIn()): ?>
               <!-- ✅ LOGGED IN: full action buttons -->
               <div class="d-flex gap-2">
-                <a href="item-detail.php?id=<?= $item['id'] ?>"
+                <a href="item-detail.php?id=<?= $item['id_barang'] ?>"
                    class="btn btn-sm flex-grow-1 fw-600"
                    style="background:rgba(249,115,22,.15);color:var(--accent);border-radius:8px;border:1px solid rgba(249,115,22,.2);"
                    onclick="event.stopPropagation()">
                   View
                 </a>
                 <?php if ($item['type'] === 'found'): ?>
-                  <a href="claim-item.php?id=<?= $item['id'] ?>"
+                  <a href="claim-item.php?id=<?= $item['id_barang'] ?>"
                      class="btn btn-sm fw-600"
                      style="background:rgba(34,197,94,.12);color:#22c55e;border-radius:8px;border:1px solid rgba(34,197,94,.2);"
                      onclick="event.stopPropagation()">
                     Claim
                   </a>
                 <?php else: ?>
-                  <a href="contact-staff.php?ref=<?= $item['id'] ?>"
+                  <a href="contact-staff.php?ref=<?= $item['id_barang'] ?>"
                      class="btn btn-sm fw-600"
                      style="background:rgba(129,140,248,.12);color:#818cf8;border-radius:8px;border:1px solid rgba(129,140,248,.2);"
                      onclick="event.stopPropagation()">
@@ -244,7 +246,7 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
               </div>
 
             <?php else: ?>
-              <!-- 🔒 GUEST: login gate — can still VIEW but can't act -->
+              <!-- 🔒 GUEST: login gate -->
               <div class="guest-gate">
                 <a href="auth/login.php"    onclick="event.stopPropagation()">Login</a>
                 or
@@ -301,7 +303,7 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
 <section class="py-5">
   <div class="container">
     <div class="cta-banner">
-      <div class="mb-3" style="font-size:2.5rem;">🔍</div>
+      <div class="mb-3" style="font-size:2.5rem;"><i class="fa-solid fa-magnifying-glass"></i></div>
       <h2 class="section-title mb-3">Ready to report or claim an item?</h2>
       <p style="color:var(--muted);max-width:480px;margin:0 auto 1.5rem;">
         Create a free account to post lost items, claim found ones, and contact our staff directly.
@@ -321,7 +323,7 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
     <div class="row align-items-center">
       <div class="col-md-4 mb-3 mb-md-0">
         <div class="navbar-brand mb-1">Find<span class="accent">It</span></div>
-        <div style="color:var(--muted);font-size:.85rem;">Community Lost &amp; Found Platform</div>
+        <div style="color:var(--muted);font-size:.85rem;">Forum penemuan barang hilang di transportasi kereta commuterlink</div>
       </div>
       <div class="col-md-4 text-center mb-3 mb-md-0">
         <div class="d-flex justify-content-center gap-3">
@@ -334,7 +336,7 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
         </div>
       </div>
       <div class="col-md-4 text-md-end">
-        <div style="color:var(--muted);font-size:.85rem;">© 2025 FindIt · PHP + Bootstrap + Tailwind</div>
+        <div style="color:var(--muted);font-size:.85rem;">Commuterlink Nusantara</div>
       </div>
     </div>
   </div>
