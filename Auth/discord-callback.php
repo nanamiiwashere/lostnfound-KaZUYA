@@ -6,7 +6,7 @@ require_once '../Auth/auth3thparty.php';
 
 $code  = $_GET['code'] ?? '';
 if (!$code) {
-    header('Location: login.php?error=oauth_failed');
+    header('Location: ' . APP_URL . 'login.php');
     exit;
 }
 
@@ -49,11 +49,11 @@ $avatar = $discordUser['avatar']
 
 $name  = $discordUser['global_name'] ?? $discordUser['username'];
 
-$stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-$stmt -> execute([$discordUser[$email]]);
+$stmt = $pdo->prepare("SELECT * FROM users WHERE oauth_uid = ? AND oauth_provider = 'discord'");
+$stmt -> execute([$discordUser['email']]);
 $user = $stmt -> fetch();
 
-if (!user){
+if (!$user){
     $stmt = $pdo -> prepare(
         "INSERT INTO users (nama, email, avatar, oauth_provider, oauth_uid)
         VALUES (?, ?, ?, 'discord', ?)"
@@ -64,11 +64,10 @@ if (!user){
     $stmt -> execute([$pdo -> lastInsertId()]);
     $user = $stmt -> fetch();
 } else {
-    $pdo -> prepare("UPDATE users SET avatar = ?, oauth_provider = ?, WHERE id_user = ?")
+    $pdo -> prepare("UPDATE users SET avatar = ?, oauth_provider = 'discord', oauth_uid = ? WHERE id_user = ?")
          -> execute([$avatar, $discordUser['id'], $user['id_user']]);
 }
 
 loginUser($user);
 header('Location: ../dashboard/index.php');
 exit;
-?>

@@ -1,5 +1,6 @@
 <?php
-require 'connect.php';
+require_once 'connect.php';
+require_once '../Auth/auth3thparty.php';
 $error = '';
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -19,7 +20,7 @@ $error = '';
         session_regenerate_id(true); // Prevent session fixation attacks
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['email'] = $user['email'];
-        $_SESSIon['username'] = $user['username'];
+        $_SESSION['username'] = $user['username'];
         $_SESSION['role'] = $user['role'];
         header("Location: dashboard.php"); // Redirect to a protected page
         exit();
@@ -30,5 +31,3 @@ $error = '';
             }
     }
 }
-
-?>
