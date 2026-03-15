@@ -1,6 +1,9 @@
 <?php
-session_start();
-require 'connect.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+ 
+require_once __DIR__ . '/../connect.php';
 
 define('GOOGLE_CLIENT_ID', '');
 define('GOOGLE_CLIENT_SECRET', '');
@@ -10,7 +13,7 @@ define('DISCORD_CLIENT_ID', '');
 define('DISCORD_CLIENT_SECRET', '');
 define('DISCORD_REDIRECT_URL', 'http://localhost/lost_found/discord_callback.php');
 
-define('APP_URL', 'localhost/lost_found/');
+define('APP_URL', 'http://localhost/lostnfound-minami');
 
 function isLoggedIn():bool {
     return isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
@@ -18,7 +21,7 @@ function isLoggedIn():bool {
 
 function requireLogin():void {
     if (!isLoggedIn()) {
-        header('Location: '. APP_URL . 'login.php');
+        header('Location: '. APP_URL . '/login.php');
         exit();
     }
 }
@@ -42,14 +45,14 @@ function loginUser(array $user): void {
     $_SESSION['name'] = $user['nama'];
     $_SESSION['role'] = $user['role'];
     $_SESSION['provider'] = $user['oauth_provider'] ?? 'email';
-    $_SESSION['avatar'] = $user[avatar] ?? null;
+    $_SESSION['avatar'] = $user['avatar'] ?? null;
     $_SESSION['logged_at'] = time();
 }
 
 function logoutUser(): void{
     session_unset();
     session_destroy();
-    header('Location: '. APP_URL . 'index.php');
+    header('Location: '. APP_URL . '/dashboard/index.php');
     exit;
 }
 
