@@ -1,6 +1,6 @@
 <?php
 require_once './connect.php';
-require_once './Auth/auth3thparty.php';
+require_once './Auth/auth-handler.php';
 require_once './core/envPrivilege.php';
 
 $stmt = $pdo->query("SELECT * FROM barang_temuan WHERE status='open' ORDER BY created_at DESC LIMIT 8");
@@ -31,55 +31,88 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
 <body>
 
 <!-- ══ NAVBAR ══ -->
-<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
-  <div class="container">
-    <a class="navbar-brand" href="<?= APP_URL ?>index.php">Lostn<span class="accent">Found</span></a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
-      <i class="fas fa-bars" style="color:#e2e8f0;"></i>
-    </button>
-    <div class="collapse navbar-collapse" id="navMenu">
-      <ul class="navbar-nav mx-auto gap-1">
-        <li class="nav-item"><a class="nav-link active" href="index.php">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="items.php">Browse Items</a></li>
-        <li class="nav-item"><a class="nav-link" href="news.php">News</a></li>
-        <li class="nav-item"><a class="nav-link" href="about.php">About</a></li>
-      </ul>
-      <div class="d-flex align-items-center gap-2">
-        <?php if (isLoggedIn()):
-              $u = currentUser(); ?>
-          <!-- navbar klo login -->
-          <a href="post-item.php" class="btn-nav-accent"><i class="fas fa-plus me-1"></i>Post Item</a>
-          <div class="dropdown">
-            <button class="btn-avatar dropdown-toggle" data-bs-toggle="dropdown">
-              <?php if (!empty($u['avatar'])): ?>
-                <img src="<?= htmlspecialchars($u['avatar']) ?>" class="avatar-img" alt=""/>
-              <?php else: ?>
-                <div class="avatar-initial"><?= strtoupper(substr($u['name'],0,1)) ?></div>
-              <?php endif; ?>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end dropdown-dark-custom">
-              <li class="dropdown-header">
-                <div class="fw-600 text-white small"><?= htmlspecialchars($u['name']) ?></div>
-                <div style="font-size:.7rem;color:var(--muted);">
-                  <?php $icons=['google'=>'fab fa-google','discord'=>'fab fa-discord','email'=>'fas fa-envelope']; ?>
-                  <i class="<?= $icons[$u['provider']]??'fas fa-user' ?> me-1"></i><?= ucfirst($u['provider']) ?>
-                </div>
-              </li>
-              <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,.08);"/></li>
-              <li><a class="dropdown-item" href="dashboard/index.php"><i class="fas fa-th-large me-2"></i>Dashboard</a></li>
-              <li><a class="dropdown-item" href="dashboard/my-items.php"><i class="fas fa-list me-2"></i>My Items</a></li>
-              <li><a class="dropdown-item" href="dashboard/messages.php"><i class="fas fa-envelope me-2"></i>Messages</a></li>
-              <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,.08);"/></li>
-              <li><a class="dropdown-item text-danger-soft" href="auth/logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
-            </ul>
+<nav class="sticky top-0 z-50 border-b" style="background:rgba(8,12,20,.85);backdrop-filter:blur(16px);border-color:rgba(255,255,255,.07);" id="mainNav">
+  <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
+ 
+    <!-- Logo -->
+    <a href="<?= APP_URL ?>index.php" class="font-bold text-2xl text-white no-underline tracking-tight" style="font-family:'Clash Display',sans-serif;">
+      Lostn<span style="color:#f97316;">Found</span>
+    </a>
+ 
+    <!-- Desktop nav links -->
+    <ul class="hidden lg:flex items-center gap-1 list-none m-0 p-0">
+      <li><a href="index.php"  class="nav-link active">Beranda</a></li>
+      <li><a href="items.php"  class="nav-link">Cari Barang</a></li>
+      <li><a href="news.php"   class="nav-link">Berita</a></li>
+      <li><a href="about.php"  class="nav-link">Tentang</a></li>
+    </ul>
+ 
+    <!-- Desktop right side -->
+    <div class="hidden lg:flex items-center gap-2">
+      <?php if (isLoggedIn()):
+            $u = currentUser(); ?>
+ 
+        <a href="post-item.php" class="btn-nav-accent"><i class="fas fa-plus me-1"></i>Post Item</a>
+ 
+        <!-- Avatar dropdown -->
+        <div class="relative" id="avatarWrap">
+          <button onclick="toggleDropdown()" class="btn-avatar">
+            <?php if (!empty($u['avatar'])): ?>
+              <img src="<?= htmlspecialchars($u['avatar']) ?>" class="avatar-img" alt=""/>
+            <?php else: ?>
+              <div class="avatar-initial"><?= strtoupper(substr($u['name'],0,1)) ?></div>
+            <?php endif; ?>
+          </button>
+          <!-- Dropdown -->
+          <div id="avatarDropdown"
+               class="hidden absolute right-0 mt-2 w-52 rounded-2xl py-2 z-50"
+               style="background:#1a2332;border:1px solid rgba(255,255,255,.07);box-shadow:0 20px 40px rgba(0,0,0,.5);">
+            <!-- User info -->
+            <div class="px-4 py-2">
+              <div class="text-white text-sm font-semibold"><?= htmlspecialchars($u['name']) ?></div>
+              <div class="text-xs mt-0.5" style="color:#64748b;">
+                <?php $icons=['google'=>'fab fa-google','discord'=>'fab fa-discord','email'=>'fas fa-envelope']; ?>
+                <i class="<?= $icons[$u['provider']]??'fas fa-user' ?> mr-1"></i><?= ucfirst($u['provider']) ?>
+              </div>
+            </div>
+            <hr style="border-color:rgba(255,255,255,.08);margin:4px 0;"/>
+            <a href="dashboard/index.php"   class="dropdown-dark-item"><i class="fas fa-th-large mr-2"></i>Dashboard</a>
+            <a href="dashboard/my-items.php"class="dropdown-dark-item"><i class="fas fa-list mr-2"></i>My Items</a>
+            <a href="dashboard/messages.php"class="dropdown-dark-item"><i class="fas fa-envelope mr-2"></i>Messages</a>
+            <hr style="border-color:rgba(255,255,255,.08);margin:4px 0;"/>
+            <a href="Auth/logout.php" class="dropdown-dark-item" style="color:#f87171;"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
           </div>
+        </div>
+ 
+      <?php else: ?>
+        <a href="./login.php"    class="btn-nav-ghost">Login</a>
+        <a href="./register.php" class="btn-nav-accent">Register</a>
+      <?php endif; ?>
+    </div>
 
-        <?php else: ?>
-          <!-- navbar guest-->
-          <a href="auth/login.php"    class="btn-nav-ghost">Login</a>
-          <a href="auth/register.php" class="btn-nav-accent">Register</a>
-        <?php endif; ?>
-      </div>
+    <!-- Mobile hamburger -->
+    <button onclick="toggleMobileMenu()" class="lg:hidden text-gray-300 p-2" style="background:none;border:none;">
+      <i class="fas fa-bars text-lg" id="hamburgerIcon"></i>
+    </button>
+  </div>
+ 
+  <!-- Mobile menu -->
+  <div id="mobileMenu" class="hidden lg:hidden border-t px-4 py-3" style="border-color:rgba(255,255,255,.07);background:rgba(8,12,20,.97);">
+    <ul class="list-none m-0 p-0 flex flex-col gap-1 mb-3">
+      <li><a href="index.php"  class="nav-link block">Beranda</a></li>
+      <li><a href="items.php"  class="nav-link block">Cari Barang</a></li>
+      <li><a href="news.php"   class="nav-link block">Berita</a></li>
+      <li><a href="about.php"  class="nav-link block">Tentang</a></li>
+    </ul>
+    <div class="flex flex-col gap-2 pt-2" style="border-top:1px solid rgba(255,255,255,.07);">
+      <?php if (isLoggedIn()): ?>
+        <a href="post-item.php"         class="btn-nav-accent text-center">Post Item</a>
+        <a href="dashboard/index.php"   class="btn-nav-ghost text-center">Dashboard</a>
+        <a href="Auth/logout.php"       class="btn-nav-ghost text-center" style="color:#f87171;border-color:rgba(239,68,68,.3);">Logout</a>
+      <?php else: ?>
+        <a href="Auth/login.php"    class="btn-nav-ghost text-center">Login</a>
+        <a href="Auth/register.php" class="btn-nav-accent text-center">Register</a>
+      <?php endif; ?>
     </div>
   </div>
 </nav>
@@ -94,7 +127,7 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
           Pengaduan barang hilang krl commuterlink nusantara
         </div>
         <h1 class="hero-title mb-4">
-          Lost something?<br/><span class="accent">We'll find it.</span>
+          Barang hilang?<br/><span class="accent">Kita bantu cari.</span>
         </h1>
         <p class="hero-sub mb-5">
           Cari barang hilang & temuan dari stasiun KRL.
@@ -131,10 +164,10 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
       <div class="col-lg-6">
         <div class="row g-3">
           <?php foreach([
-            ['num'=>$totalLost,  'lbl'=>'Lost Items',    'icon'=>'fa-exclamation-circle','color'=>'#ef4444'],
-            ['num'=>$totalFound, 'lbl'=>'Found Items',   'icon'=>'fa-hand-holding',      'color'=>'#22c55e'],
-            ['num'=>$resolved,   'lbl'=>'Reunited',      'icon'=>'fa-handshake',         'color'=>'#f97316'],
-            ['num'=>'24/7',      'lbl'=>'Staff Support', 'icon'=>'fa-headset',           'color'=>'#818cf8'],
+            ['num'=>$totalLost,  'lbl'=>'Barang hilang',    'icon'=>'fa-exclamation-circle','color'=>'#ef4444'],
+            ['num'=>$totalFound, 'lbl'=>'Barang ditemukan',   'icon'=>'fa-hand-holding',      'color'=>'#22c55e'],
+            ['num'=>$resolved,   'lbl'=>'Berhasil dikembalikan',      'icon'=>'fa-handshake',         'color'=>'#f97316'],
+            ['num'=>'24/7',      'lbl'=>'Dukungan Staff', 'icon'=>'fa-headset',           'color'=>'#818cf8'],
           ] as $s): ?>
           <div class="col-6">
             <div class="p-4 rounded-3" style="background:var(--card);border:1px solid var(--border);">
@@ -246,7 +279,6 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
               </div>
 
             <?php else: ?>
-              <!-- 🔒 GUEST: login gate -->
               <div class="guest-gate">
                 <a href="auth/login.php"    onclick="event.stopPropagation()">Login</a>
                 or
@@ -262,7 +294,7 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
   </div>
 </section>
 
-<!-- ══ NEWS — PUBLIC ══ -->
+<!-- NEWS  -->
 <section class="py-5" style="background:var(--surface);border-top:1px solid var(--border);">
   <div class="container">
     <div class="d-flex justify-content-between align-items-end mb-4">
@@ -320,28 +352,76 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
 <!-- ══ FOOTER ══ -->
 <footer>
   <div class="container">
-    <div class="row align-items-center">
-      <div class="col-md-4 mb-3 mb-md-0">
-        <div class="navbar-brand mb-1">Find<span class="accent">It</span></div>
-        <div style="color:var(--muted);font-size:.85rem;">Forum penemuan barang hilang di transportasi kereta commuterlink</div>
+    <div class="row g-4 pb-4" style="border-bottom:1px solid var(--border);">
+ 
+      <!-- Brand + desc -->
+      <div class="col-lg-4 col-md-6">
+        <div class="navbar-brand mb-2">Lostn<span class="accent">Found</span></div>
+        <div style="color:var(--muted);font-size:.85rem;line-height:1.7;max-width:280px;">
+          Forum penemuan barang hilang di transportasi kereta commuterlink nusantara.
+        </div>
+        <!-- Socmed -->
+        <div class="d-flex gap-3 mt-3">
+          <a href="#" style="color:var(--muted);font-size:1.1rem;transition:color .2s;" onmouseover="this.style.color='#f97316'" onmouseout="this.style.color='#64748b'">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="#" style="color:var(--muted);font-size:1.1rem;transition:color .2s;" onmouseover="this.style.color='#f97316'" onmouseout="this.style.color='#64748b'">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="#" style="color:var(--muted);font-size:1.1rem;transition:color .2s;" onmouseover="this.style.color='#f97316'" onmouseout="this.style.color='#64748b'">
+            <i class="fab fa-facebook"></i>
+          </a>
+          <a href="#" style="color:var(--muted);font-size:1.1rem;transition:color .2s;" onmouseover="this.style.color='#5865f2'" onmouseout="this.style.color='#64748b'">
+            <i class="fab fa-discord"></i>
+          </a>
+        </div>
       </div>
-      <div class="col-md-4 text-center mb-3 mb-md-0">
-        <div class="d-flex justify-content-center gap-3">
-          <a href="items.php" style="color:var(--muted);font-size:.85rem;text-decoration:none;">Browse</a>
-          <a href="news.php"  style="color:var(--muted);font-size:.85rem;text-decoration:none;">News</a>
-          <a href="about.php" style="color:var(--muted);font-size:.85rem;text-decoration:none;">About</a>
-          <?php if (!isLoggedIn()): ?>
-          <a href="auth/login.php" style="color:var(--muted);font-size:.85rem;text-decoration:none;">Login</a>
+ 
+      <!-- Links -->
+      <div class="col-lg-2 col-md-3 col-6">
+        <div style="color:#e2e8f0;font-weight:700;font-size:.85rem;margin-bottom:12px;font-family:'Clash Display',sans-serif;">Quick Links</div>
+        <div class="d-flex flex-column gap-2">
+          <a href="items.php" style="color:var(--muted);font-size:.85rem;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f97316'" onmouseout="this.style.color='#64748b'">Browse Items</a>
+          <a href="news.php"  style="color:var(--muted);font-size:.85rem;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f97316'" onmouseout="this.style.color='#64748b'">News</a>
+          <a href="about.php" style="color:var(--muted);font-size:.85rem;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f97316'" onmouseout="this.style.color='#64748b'">About</a>
+        </div>
+      </div>
+ 
+      <!-- Account -->
+      <div class="col-lg-2 col-md-3 col-6">
+        <div style="color:#e2e8f0;font-weight:700;font-size:.85rem;margin-bottom:12px;font-family:'Clash Display',sans-serif;">Akun</div>
+        <div class="d-flex flex-column gap-2">
+          <?php if (isLoggedIn()): ?>
+            <a href="dashboard/index.php" style="color:var(--muted);font-size:.85rem;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f97316'" onmouseout="this.style.color='#64748b'">Dashboard</a>
+            <a href="post-item.php"       style="color:var(--muted);font-size:.85rem;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f97316'" onmouseout="this.style.color='#64748b'">Post Item</a>
+            <a href="Auth/logout.php"     style="color:#f87171;font-size:.85rem;text-decoration:none;">Logout</a>
+          <?php else: ?>
+            <a href="Auth/login.php"    style="color:var(--muted);font-size:.85rem;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f97316'" onmouseout="this.style.color='#64748b'">Login</a>
+            <a href="Auth/register.php" style="color:var(--muted);font-size:.85rem;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f97316'" onmouseout="this.style.color='#64748b'">Register</a>
           <?php endif; ?>
         </div>
       </div>
-      <div class="col-md-4 text-md-end">
-        <div style="color:var(--muted);font-size:.85rem;">Commuterlink Nusantara</div>
+ 
+      <!-- Contact -->
+      <div class="col-lg-4 col-md-6">
+        <div style="color:#e2e8f0;font-weight:700;font-size:.85rem;margin-bottom:12px;font-family:'Clash Display',sans-serif;">Kontak</div>
+        <div class="d-flex flex-column gap-2">
+          <div style="color:var(--muted);font-size:.85rem;"><i class="fas fa-envelope me-2" style="color:var(--accent);"></i>lostnfound@krl.co.id</div>
+          <div style="color:var(--muted);font-size:.85rem;"><i class="fas fa-phone me-2" style="color:var(--accent);"></i>021-1234-5678</div>
+          <div style="color:var(--muted);font-size:.85rem;"><i class="fas fa-map-marker-alt me-2" style="color:var(--accent);"></i>Jakarta, Indonesia</div>
+        </div>
       </div>
+ 
     </div>
+ 
+    <!-- Copyright -->
+    <div class="d-flex justify-content-between align-items-center pt-4 flex-wrap gap-2">
+      <div style="color:var(--muted);font-size:.82rem;">© <?= date('Y') ?> LostnFound · Powered by Commuterlink Nusantara</div>
+    </div>
+ 
   </div>
 </footer>
-
+ 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 function filterItems(type, btn) {
@@ -350,6 +430,27 @@ function filterItems(type, btn) {
   document.querySelectorAll('.item-col').forEach(col => {
     col.style.display = (type === 'all' || col.dataset.type === type) ? '' : 'none';
   });
+
+// navbar section //
+function toggleDropdown() {
+  document.getElementById('avatarDropdown').classList.toggle('hidden');
+}
+
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('avatarWrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('avatarDropdown')?.classList.add('hidden');
+  }
+});
+ 
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const icon = document.getElementById('hamburgerIcon');
+  const isHidden = menu.classList.contains('nav-hidden');
+  menu.classList.toggle('nav-hidden', !isHidden);
+  menu.classList.toggle('nav-visible', isHidden);
+  icon.className = isHidden ? 'fas fa-times text-lg' : 'fas fa-bars text-lg';
+}
 }
 </script>
 </body>

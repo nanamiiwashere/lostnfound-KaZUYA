@@ -19,7 +19,7 @@ $tokenResponse = file_get_contents('https://oauth2.googleapis.com/token', false,
             'code' => $code,
             'client_id' => GOOGLE_CLIENT_ID,
             'client_secret' => GOOGLE_CLIENT_SECRET,
-            'redirect_url' => GOOGLE_REDIRECT_URL,
+            'redirect_uri' => GOOGLE_REDIRECT_URI,
             'grant_type' => 'authorization_code',
         ]),
     ]
@@ -46,7 +46,7 @@ if (empty($googleUser['email'])){
 $stmt = $pdo->prepare("
     SELECT * FROM users 
     WHERE oauth_uid = ? AND oauth_provider = 'google'");
-stmt->execute([$googleUser['id']]);
+$stmt -> execute([$googleUser['id']]);
 $user = $stmt->fetch();
 
 

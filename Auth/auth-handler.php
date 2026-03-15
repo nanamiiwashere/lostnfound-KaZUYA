@@ -1,6 +1,6 @@
 <?php
-require_once 'connect.php';
-require_once '../Auth/auth3thparty.php';
+require_once './Auth/auth3thparty.php';
+require_once './connect.php';
 $error = '';
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -18,16 +18,16 @@ $error = '';
     if ($user && password_verify($password, $user['password'])) {
 
         session_regenerate_id(true); // Prevent session fixation attacks
-        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['user_id'] = $user['id_user'];
         $_SESSION['email'] = $user['email'];
-        $_SESSION['username'] = $user['username'];
+        loginUser($user);
         $_SESSION['role'] = $user['role'];
-        header("Location: dashboard.php"); // Redirect to a protected page
+        header('Location: '. APP_URL . '/dashboard/index.php'); // Redirect to a protected page
         exit();
 
         } else {
             // Authentication failed
-            echo "Invalid email or password.";
+            $error = "Invalid email or password.";
             }
     }
 }
