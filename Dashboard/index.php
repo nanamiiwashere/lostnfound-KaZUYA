@@ -5,6 +5,11 @@ requireLogin();
 $u = currentUser();
 $activePage = 'home';
 
+if (($u['role'] ?? '') === 'staff'){
+  header('Location: staff-laporan.php');
+  exit();
+}
+
 $totalLaporan = $pdo -> prepare("SELECT COUNT(*) FROM laporan_kehilangan WHERE id_pelapor=? AND type='lost'");
 $totalLaporan -> execute([$u['id']]);
 $totalLaporan = (int)$totalLaporan -> fetchColumn();

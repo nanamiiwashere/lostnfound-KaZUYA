@@ -1,7 +1,7 @@
 <?php 
 if (session_status() === PHP_SESSION_NONE) session_start();
 require_once '../connect.php';
-require_once '../auth/auth3thparty.php';
+require_once '../Auth/auth3thparty.php';
 requireLogin();
 
 $u = currentUser();
@@ -13,7 +13,7 @@ if (!$id) {
     exit();
 }
 
-$stmt = $pdo -> prepare("SELECT * FROM barang_temuan WHERE id_barang=? AND id_petugas=?");
+$stmt = $pdo -> prepare("SELECT * FROM laporan_kehilangan WHERE id_laporan=? AND id_pelapor=?");
 $stmt -> execute([$id, $u['id']]);
 $item = $stmt -> fetch();
 if (!$item){
@@ -22,7 +22,7 @@ if (!$item){
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['konfirmasi'])){
-    $pdo -> prepare("UPDATE barang_temuan SET status='resolved' WHERE id_barang=? AND id_petugas=?") -> execute([$id, $u['id']]);
+    $pdo -> prepare("UPDATE laporan_kehilangan SET status='resolved' WHERE id_laporan=? AND id_pelapor=?") -> execute([$id, $u['id']]);
     header("Location: detail-laporan.php?id=$id&confirmed=1");
     exit();
 }
@@ -41,7 +41,7 @@ $confirmed = isset($_GET['confirmed']);
   <script>tailwind.config={corePlugins:{preflight:false}}</script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;600;700&family=Cabinet+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="dashboard.css"/>
+    <link rel="stylesheet" href="../dashboard/partials/style.css">
 </head>
 <body>
 <?php require_once 'partials/sidebar.php'; ?>
@@ -92,11 +92,11 @@ $confirmed = isset($_GET['confirmed']);
             </div>
             <div class="col-sm-6">
               <div style="color:#64748b;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Lokasi</div>
-              <div style="color:#e2e8f0;font-size:.9rem;"><i class="fas fa-map-marker-alt me-1" style="color:#f97316;"></i><?= htmlspecialchars($item['lokasi_ditemukan']) ?></div>
+              <div style="color:#e2e8f0;font-size:.9rem;"><i class="fas fa-map-marker-alt me-1" style="color:#f97316;"></i><?= htmlspecialchars($item['lokasi_kehilangan']) ?></div>
             </div>
             <div class="col-sm-6">
               <div style="color:#64748b;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Tanggal Kejadian</div>
-              <div style="color:#e2e8f0;font-size:.9rem;"><i class="fas fa-calendar me-1" style="color:#f97316;"></i><?= date('d F Y', strtotime($item['tanggal_ditemukan'])) ?></div>
+              <div style="color:#e2e8f0;font-size:.9rem;"><i class="fas fa-calendar me-1" style="color:#f97316;"></i><?= date('d F Y', strtotime($item['tanggal_kehilangan'])) ?></div>
             </div>
             <div class="col-sm-6">
               <div style="color:#64748b;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Dilaporkan</div>
@@ -112,11 +112,16 @@ $confirmed = isset($_GET['confirmed']);
         <div class="dash-card p-4 mb-4">
           <div style="font-family:'Clash Display',sans-serif;font-weight:700;color:#fff;margin-bottom:1rem;">Status Perkembangan</div>
           <?php
+          $isFound     = $item['type'] === 'found';
+          $isResolved  = in_array($item['status'], ['resolved', 'closed']);
+          $isProcessed = $item['status'] !== 'open';
+          $itemFound   = $isFound || $isResolved; // found by type OR sudah resolved/closed
+ 
           $steps = [
-            ['label'=>'Laporan Dibuat',        'done'=>true,                              'icon'=>'fa-file-alt'],
-            ['label'=>'Diproses Petugas',       'done'=>$item['status']!=='open',          'icon'=>'fa-user-tie'],
-            ['label'=>'Barang Ditemukan',       'done'=>$item['status']==='resolved',      'icon'=>'fa-box-open'],
-            ['label'=>'Kepemilikan Dikonfirmasi','done'=>$item['status']==='resolved',     'icon'=>'fa-check-double'],
+            ['label'=>'Laporan Dibuat',           'done'=> true,         'icon'=>'fa-file-alt'],
+            ['label'=>'Diproses Petugas',          'done'=> $isProcessed, 'icon'=>'fa-user-tie'],
+            ['label'=>'Barang Ditemukan',          'done'=> $itemFound,   'icon'=>'fa-box-open'],
+            ['label'=>'Kepemilikan Dikonfirmasi',  'done'=> $isResolved,  'icon'=>'fa-check-double'],
           ];
           foreach($steps as $i => $step): ?>
           <div class="d-flex align-items-center gap-3 mb-3">
@@ -143,7 +148,7 @@ $confirmed = isset($_GET['confirmed']);
             </button>
           </form>
         </div>
-        <?php elseif ($item['status']==='resolved'): ?>
+        <?php elseif (in_array($item['status'], ['resolved','closed'])): ?>
         <div class="dash-card p-4" style="background:rgba(34,197,94,.05);border-color:rgba(34,197,94,.2);">
           <div class="text-center">
             <i class="fas fa-check-circle fa-2x mb-2" style="color:#22c55e;display:block;"></i>

@@ -57,3 +57,14 @@ function logoutUser(): void{
 }
 
 
+function requireStaff(): void {
+    if (session_status() === PHP_SESSION_NONE) session_start();
+    if (!isset($_SESSION['id_user'])) {
+        header('Location: ' . APP_URL . '/login.php');
+        exit();
+    }
+    if ($_SESSION['role'] !== 'staff') {
+        header('Location: ' . APP_URL . '/dashboard/index.php');
+        exit();
+    }
+}

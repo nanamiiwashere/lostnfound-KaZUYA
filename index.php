@@ -236,7 +236,7 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
         <div class="item-card h-100" onclick="location.href='item-detail.php?id=<?= $item['id_barang'] ?>'">
           <div class="item-card-img-wrap">
             <?php if (!empty($item['image'])): ?>
-              <img src="uploads/<?= htmlspecialchars($item['image']) ?>" class="item-card-img" alt=""/>
+              <img src="./uploads/avatars/<?= htmlspecialchars($item['image']) ?>" class="item-card-img" alt=""/>
             <?php else: ?>
               <div class="img-placeholder">
                 <i class="fas <?= $icon ?> fa-2x" style="color:rgba(255,255,255,.15);"></i>
@@ -430,6 +430,7 @@ function filterItems(type, btn) {
   document.querySelectorAll('.item-col').forEach(col => {
     col.style.display = (type === 'all' || col.dataset.type === type) ? '' : 'none';
   });
+}  
 
 // navbar section //
 function toggleDropdown() {
@@ -450,7 +451,6 @@ function toggleMobileMenu() {
   menu.classList.toggle('nav-hidden', !isHidden);
   menu.classList.toggle('nav-visible', isHidden);
   icon.className = isHidden ? 'fas fa-times text-lg' : 'fas fa-bars text-lg';
-}
 }
 </script>
 </body>
