@@ -110,7 +110,7 @@ $items = $stmt -> fetchAll();
               <div style="color:#fff;font-weight:700;margin:4px 0 8px;font-size:.95rem;"><?= htmlspecialchars($item['nama_barang']) ?></div>
               <div style="color:#64748b;font-size:.8rem;margin-bottom:12px;"><i class="fas fa-map-marker-alt me-1" style="color:#f97316;"></i><?= htmlspecialchars($item['lokasi_ditemukan']) ?></div>
               <div style="color:#475569;font-size:.75rem;margin-bottom:12px;"><i class="fas fa-calendar me-1"></i><?= date('d M Y', strtotime($item['created_at'])) ?></div>
-              <a href="../item-detail.php?id=<?= $item['id_barang'] ?>" class="btn-accent w-100" style="justify-content:center;font-size:.82rem;">
+              <a href="./item-detail.php?id=<?= $item['id_barang'] ?>" class="btn-accent w-100" style="justify-content:center;font-size:.82rem;">
                 <i class="fas fa-eye"></i>Lihat Detail & Klaim
               </a>
             </div>
