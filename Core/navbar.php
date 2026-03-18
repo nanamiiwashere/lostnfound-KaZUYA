@@ -28,7 +28,6 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         <?php if (isLoggedIn()):
               $u = currentUser(); ?>
  
-          <!-- Logged in -->
           <a href="<?= APP_URL ?>post-item.php" class="btn-nav-accent">
             <i class="fas fa-plus me-1"></i>Post Item
           </a>
