@@ -191,10 +191,10 @@ $confirmed = isset($_GET['confirmed']);
               <div style="color:#86efac;font-weight:600;font-size:.9rem;"><?= htmlspecialchars($pencocokanVerified['nama_barang_temuan']) ?></div>
               <div style="color:#64748b;font-size:.78rem;"><i class="fas fa-map-marker-alt me-1" style="color:#f97316;"></i><?= htmlspecialchars($pencocokanVerified['lokasi_ditemukan']) ?></div>
             </div>
-            <div style="color:#64748b;font-size:.82rem;margin-bottom:1rem;">Konfirmasi bahwa barang sudah kamu terima untuk menutup laporan ini.</div>
+            <div style="color:#64748b;font-size:.82rem;margin-bottom:1rem;">Konfirmasi bahwa barang sesuai deskripsi laporan untuk mendapatkan informasi lebih lanjut.</div>
             <form method="POST">
               <input type="hidden" name="konfirmasi" value="1"/>
-              <button type="submit" class="btn-accent w-100" style="background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3);justify-content:center;" onclick="return confirm('Konfirmasi barang sudah kamu terima?')">
+              <button type="submit" class="btn-accent w-100" style="background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3);justify-content:center;" onclick="return confirm('Konfirmasi barang sudah sesuai laporan?')">
                 <i class="fas fa-check-circle"></i>Konfirmasi Kepemilikan
               </button>
             </form>

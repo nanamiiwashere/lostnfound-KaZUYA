@@ -1,7 +1,7 @@
 <?php
 $uid = $u['id'] ?? $_SESSION['id_user'] ?? null;
 $notifs = [];
-require_once 'markasread.php';
+$notifKey = 'notif_read_' . $uid;
 
 if ($uid) {
     $q1 = $pdo->prepare("
@@ -174,6 +174,7 @@ function timeAgo($datetime){
 <script>
 function toggleNotif(){
     const dd = document.getElementById('notifDropdown');
+    const isOpening = dd.style.display === 'none';
     dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
     if (isOpening){
         fetch('markasread.php', {
