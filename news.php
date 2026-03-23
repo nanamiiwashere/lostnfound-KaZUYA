@@ -82,8 +82,8 @@ $displayNews = empty($news) ? $demoNews : $news;
           </div>
         </div>
       <?php else: ?>
-        <a href="Auth/login.php"    class="btn-nav-ghost">Login</a>
-        <a href="Auth/register.php" class="btn-nav-accent">Register</a>
+        <a href="./login.php"    class="btn-nav-ghost">Login</a>
+        <a href="./register.php" class="btn-nav-accent">Register</a>
       <?php endif; ?>
     </div>
     <button onclick="toggleMobileMenu()" class="lg:hidden text-gray-300 p-2" style="background:none;border:none;cursor:pointer;">
@@ -101,8 +101,8 @@ $displayNews = empty($news) ? $demoNews : $news;
         <a href="Dashboard/index.php" class="btn-nav-accent text-center">Dashboard</a>
         <a href="Auth/logout.php"     class="btn-nav-ghost text-center" style="color:#f87171;">Logout</a>
       <?php else: ?>
-        <a href="Auth/login.php"    class="btn-nav-ghost text-center">Login</a>
-        <a href="Auth/register.php" class="btn-nav-accent text-center">Register</a>
+        <a href="./login.php"    class="btn-nav-ghost text-center">Login</a>
+        <a href="./register.php" class="btn-nav-accent text-center">Register</a>
       <?php endif; ?>
     </div>
   </div>

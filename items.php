@@ -91,8 +91,8 @@ $catIcons = [
           </div>
         </div>
       <?php else: ?>
-        <a href="Auth/login.php"    class="btn-nav-ghost"  onclick="startProgress()">Login</a>
-        <a href="Auth/register.php" class="btn-nav-accent" onclick="startProgress()">Register</a>
+        <a href="./login.php"    class="btn-nav-ghost"  onclick="startProgress()">Login</a>
+        <a href="./register.php" class="btn-nav-accent" onclick="startProgress()">Register</a>
       <?php endif; ?>
     </div>
     <button onclick="toggleMobileMenu()" class="lg:hidden" style="background:none;border:none;color:#e2e8f0;cursor:pointer;padding:4px;">
@@ -111,8 +111,8 @@ $catIcons = [
         <a href="Dashboard/index.php" class="btn-nav-accent text-center" onclick="startProgress()">Dashboard</a>
         <a href="Auth/logout.php"     class="btn-nav-ghost text-center" style="color:#f87171;" onclick="startProgress()">Logout</a>
       <?php else: ?>
-        <a href="Auth/login.php"    class="btn-nav-ghost text-center"  onclick="startProgress()">Login</a>
-        <a href="Auth/register.php" class="btn-nav-accent text-center" onclick="startProgress()">Register</a>
+        <a href="./login.php"    class="btn-nav-ghost text-center"  onclick="startProgress()">Login</a>
+        <a href="./register.php" class="btn-nav-accent text-center" onclick="startProgress()">Register</a>
       <?php endif; ?>
     </div>
   </div>
@@ -231,9 +231,9 @@ $catIcons = [
                 </a>
               <?php else: ?>
                 <div class="guest-gate">
-                  <a href="Auth/login.php" onclick="event.stopPropagation()">Login</a>
+                  <a href="./login.php" onclick="event.stopPropagation()">Login</a>
                   atau
-                  <a href="Auth/register.php" onclick="event.stopPropagation()">Register</a>
+                  <a href="./register.php" onclick="event.stopPropagation()">Register</a>
                   untuk lihat detail
                 </div>
               <?php endif; ?>
@@ -264,8 +264,8 @@ $catIcons = [
         Buat laporan agar petugas bisa mencocokkan dengan barang temuan yang ada.
       </p>
       <div class="d-flex justify-content-center gap-3 flex-wrap">
-        <a href="Auth/register.php" class="btn-primary-custom" onclick="startProgress()"><i class="fas fa-user-plus"></i>Buat Akun Gratis</a>
-        <a href="Auth/login.php"    class="btn-ghost-custom"   onclick="startProgress()"><i class="fas fa-sign-in-alt"></i>Sudah punya akun? Login</a>
+        <a href="./register.php" class="btn-primary-custom" onclick="startProgress()"><i class="fas fa-user-plus"></i>Buat Akun Gratis</a>
+        <a href="./login.php"    class="btn-ghost-custom"   onclick="startProgress()"><i class="fas fa-sign-in-alt"></i>Sudah punya akun? Login</a>
       </div>
     </div>
   </div>
