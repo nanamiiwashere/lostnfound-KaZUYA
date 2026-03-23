@@ -36,7 +36,7 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
   <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
  
     <!-- Logo -->
-    <a href="<?= APP_URL ?>index.php" class="font-bold text-2xl text-white no-underline tracking-tight" style="font-family:'Clash Display',sans-serif;">
+    <a href="<?= APP_URL ?>/index.php" class="font-bold text-2xl text-white no-underline tracking-tight" style="font-family:'Clash Display',sans-serif;">
       Lostn<span style="color:#f97316;">Found</span>
     </a>
  

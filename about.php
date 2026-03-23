@@ -68,8 +68,8 @@ $totalUser     = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE role='user'"
           </div>
         </div>
       <?php else: ?>
-        <a href="./Auth/login.php"    class="btn-nav-ghost">Login</a>
-        <a href="./Auth/register.php" class="btn-nav-accent">Register</a>
+        <a href="./login.php"    class="btn-nav-ghost">Login</a>
+        <a href="./register.php" class="btn-nav-accent">Register</a>
       <?php endif; ?>
     </div>
     <button onclick="toggleMobileMenu()" class="lg:hidden text-gray-300 p-2" style="background:none;border:none;cursor:pointer;">
@@ -136,7 +136,7 @@ $totalUser     = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE role='user'"
 
         <div class="d-flex gap-3 flex-wrap fade-in-up delay-4">
           <a href="items.php"           class="btn-primary-custom"><i class="fas fa-search"></i>Cari Barang</a>
-          <a href="Auth/register.php"   class="btn-ghost-custom"><i class="fas fa-user-plus"></i>Daftar Gratis</a>
+          <a href="./register.php"   class="btn-ghost-custom"><i class="fas fa-user-plus"></i>Daftar Gratis</a>
         </div>
       </div>
 
@@ -278,7 +278,7 @@ $totalUser     = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE role='user'"
         Buat laporan sekarang dan biarkan sistem kami bekerja. Ribuan barang sudah berhasil dikembalikan.
       </p>
       <div class="d-flex justify-content-center gap-3 flex-wrap">
-        <a href="./Auth/register.php" class="btn-primary-custom"><i class="fas fa-user-plus"></i>Buat Akun Gratis</a>
+        <a href="./register.php" class="btn-primary-custom"><i class="fas fa-user-plus"></i>Buat Akun Gratis</a>
         <a href="items.php"           class="btn-ghost-custom"><i class="fas fa-search"></i>Lihat Barang Temuan</a>
       </div>
     </div>
@@ -312,8 +312,8 @@ $totalUser     = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE role='user'"
             <a href="dashboard/index.php" style="color:var(--muted);font-size:.85rem;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f97316'" onmouseout="this.style.color='#64748b'">Dashboard</a>
             <a href="Auth/logout.php"     style="color:#f87171;font-size:.85rem;text-decoration:none;">Logout</a>
           <?php else: ?>
-            <a href="./Auth/login.php"    style="color:var(--muted);font-size:.85rem;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f97316'" onmouseout="this.style.color='#64748b'">Login</a>
-            <a href="./Auth/register.php" style="color:var(--muted);font-size:.85rem;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f97316'" onmouseout="this.style.color='#64748b'">Register</a>
+            <a href="./login.php"    style="color:var(--muted);font-size:.85rem;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f97316'" onmouseout="this.style.color='#64748b'">Login</a>
+            <a href="./register.php" style="color:var(--muted);font-size:.85rem;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#f97316'" onmouseout="this.style.color='#64748b'">Register</a>
           <?php endif; ?>
         </div>
       </div>
