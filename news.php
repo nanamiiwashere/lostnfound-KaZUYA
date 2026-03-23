@@ -33,9 +33,9 @@ $displayNews = empty($news) ? $demoNews : $news;
 <?php 
     $navItems = [
         ['href' => 'index.php', 'label' => 'Beranda'],
-        ['href' => 'item.php', 'label' => 'Cari Barang'],
-        ['href' => 'news.php', 'label' => 'Beranda'],
-        ['href' => 'index.php', 'label' => 'Beranda'],
+        ['href' => 'items.php', 'label' => 'Cari Barang'],
+        ['href' => 'news.php', 'label' => 'Berita'],
+        ['href' => 'about.php', 'label' => 'Tentang'],
     ]
 ?>
 
@@ -52,6 +52,7 @@ $displayNews = empty($news) ? $demoNews : $news;
     </ul>
     <div class="hidden lg:flex items-center gap-2">
       <?php if (isLoggedIn()): $u = currentUser(); ?>
+                <!-- Avatar dropdown -->
         <div class="relative" id="avatarWrap">
           <button onclick="toggleDropdown()" class="btn-avatar">
             <?php if (!empty($u['avatar'])): ?>
@@ -60,7 +61,7 @@ $displayNews = empty($news) ? $demoNews : $news;
                 $avSrc = str_starts_with($av, 'http') ? $av : 'uploads/' . $av;?>
               <img src="<?= htmlspecialchars($avSrc) ?>" class="avatar-img" alt=""/>
             <?php else: ?>
-              <div class="avatar-initial"><i class="fas fa-user" style="font-size:.85rem;"></i></div>
+              <div class="avatar-initial"><?= strtoupper(substr($u['name'],0,1)) ?></div>
             <?php endif; ?>
           </button>
           <div id="avatarDropdown" class="hidden absolute right-0 mt-2 w-52 rounded-2xl py-2 z-50"
@@ -74,8 +75,8 @@ $displayNews = empty($news) ? $demoNews : $news;
             </div>
             <hr style="border-color:rgba(255,255,255,.08);margin:4px 0;"/>
             <a href="Dashboard/index.php"  class="dropdown-dark-item"><i class="fas fa-th-large mr-2"></i>Dashboard</a>
-            <a href="Dashboard/laporan.php"class="dropdown-dark-item"><i class="fas fa-file-alt mr-2"></i>Laporan Saya</a>
-            <a href="Dashboard/profil.php" class="dropdown-dark-item"><i class="fas fa-user-cog mr-2"></i>Settings</a>
+            <a href="Dashboard/laporan.php"class="dropdown-dark-item"><i class="fas fa-file-alt mr-2"></i>History</a>
+            <a href="Dashboard/profil.php" class="dropdown-dark-item"><i class="fas fa-user-circle mr-2"></i>Profile</a>
             <hr style="border-color:rgba(255,255,255,.08);margin:4px 0;"/>
             <a href="Auth/logout.php" class="dropdown-dark-item" style="color:#f87171;"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
           </div>

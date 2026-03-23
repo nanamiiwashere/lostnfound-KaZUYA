@@ -109,7 +109,7 @@ body {
     color: #64748b;
 }
 
-/* ── Main Layout ── */
+
 .main-wrap {
     margin-left: 250px;
     min-height: 100vh;
@@ -130,7 +130,7 @@ body {
 
 .page-content { padding: 2rem; }
 
-/* ── Cards ── */
+
 .dash-card {
     background: #111927;
     border: 1px solid rgba(255,255,255,.07);
@@ -195,7 +195,7 @@ body {
     margin-top: 4px;
 }
 
-/* ── Table ── */
+
 .dash-table { width: 100%; border-collapse: collapse; }
 
 .dash-table thead th {
@@ -220,7 +220,7 @@ body {
 .dash-table tbody tr:last-child td { border-bottom: none; }
 .dash-table tbody tr:hover { background: rgba(255,255,255,.02); }
 
-/* ── Badges ── */
+
 .bdg {
     border-radius: 6px;
     padding: 3px 10px;
@@ -236,7 +236,7 @@ body {
 .bdg-closed   { background: rgba(100,116,139,.15);  color: #94a3b8; border: 1px solid rgba(100,116,139,.2);  }
 .bdg-pending  { background: rgba(234,179,8,.15);    color: #fde047; border: 1px solid rgba(234,179,8,.2);    }
 
-/* ── Buttons ── */
+
 .btn-accent {
     background: #f97316;
     color: #fff;
@@ -273,7 +273,6 @@ body {
 
 .btn-ghost-sm:hover { color: #e2e8f0; border-color: rgba(255,255,255,.2); }
 
-/* ── Form ── */
 .form-group { margin-bottom: 1.2rem; }
 
 .form-group label {
@@ -307,7 +306,7 @@ body {
 .form-input::placeholder { color: #475569; }
 select.form-input option { background: #111927; }
 
-/* ── Alerts ── */
+
 .alert-success {
     background: rgba(34,197,94,.1);
     border: 1px solid rgba(34,197,94,.25);
@@ -326,7 +325,7 @@ select.form-input option { background: #111927; }
     font-size: .88rem;
 }
 
-/* ── Empty State ── */
+
 .empty-state {
     text-align: center;
     padding: 3rem 2rem;
@@ -340,14 +339,14 @@ select.form-input option { background: #111927; }
     display: block;
 }
 
-/* ── Mobile ── */
+
 @media (max-width: 991px) {
     .sidebar { transform: translateX(-100%); }
     .sidebar.open { transform: none; }
     .main-wrap { margin-left: 0; }
 }
 
-/*-- upload --*/
+
 .upload-area { 
     border:2px dashed rgba(255,255,255,.12); 
     border-radius:12px; 
@@ -550,10 +549,10 @@ select.form-input option { background: #111927; }
     --accent:  #f97316;
 }
 
-/* ── Base override untuk public pages (body bawaan ga ada bg) ── */
+
 body { background: #080c14; color: #e2e8f0; }
 
-/* ── Public Navbar ── */
+
 .accent { color: #f97316; }
 
 .nav-link {
@@ -634,7 +633,7 @@ body { background: #080c14; color: #e2e8f0; }
     border: 2px solid rgba(255,255,255,.1);
 }
 
-/* ── Footer ── */
+
 footer {
     background: #0d1521;
     border-top: 1px solid rgba(255,255,255,.07);
@@ -642,7 +641,6 @@ footer {
     margin-top: 3rem;
 }
 
-/* ── btn-primary-custom ── */
 .btn-primary-custom {
     background: #f97316;
     color: #fff;
@@ -660,3 +658,156 @@ footer {
     font-family: 'Cabinet Grotesk', sans-serif;
 }
 .btn-primary-custom:hover { opacity: .85; color: #fff; }
+
+.notif-bell-wrap {
+    position: relative;
+}
+
+.notif-bell-btn {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 10px;
+    width: 38px; height: 38px;
+    display: flex;
+    align-items: center; justify-content: center;
+    cursor: pointer; color:#94a3b8;
+    transition: all .2s;
+    position: relative;
+}
+
+.notif-bell-btn:hover {
+    background: rgba(255,255,255,.09);
+    color: #e2e8f0;
+}
+
+.notif-badge {
+    position: absolute; top: -5px; right: -5px;
+    background: #f97316; color: #fff;
+    font-size: .6rem;
+    font-weight: 700;
+    width: 17px; height: 17px; border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #080c14;
+}
+
+.notif-dropdown {
+    position:absolute; right:0; top:calc(100% + 10px);
+    width:340px; z-index:500;
+    background:#111927;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;
+    box-shadow:0 20px 50px rgba(0,0,0,.6);
+    overflow:hidden;
+}
+
+.notif-dropdown-header {
+    padding: .9rem 1.1rem;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.notif-dropdown-title {
+    font-family:'Clash Display',sans-serif;
+    font-weight:700; color:#fff; font-size:.9rem;
+}
+
+.notif-list { 
+    max-height:360px; overflow-y:auto; 
+}
+
+.notif-list::-webkit-scrollbar { 
+    width:4px; 
+}
+
+.notif-list::-webkit-scrollbar-track { 
+    background:transparent; 
+}
+
+.notif-list::-webkit-scrollbar-thumb { 
+    background:rgba(255,255,255,.1); border-radius:2px; 
+}
+
+.notif-item {
+    display:flex; align-items:flex-start; gap:12px;
+    padding:.9rem 1.1rem;
+    border-bottom:1px solid rgba(255,255,255,.04);
+    text-decoration:none;
+    transition:background .15s;
+    cursor:pointer;
+}
+
+.notif-item:last-child { 
+    border-bottom:none; 
+}
+
+.notif-item:hover { 
+    background:rgba(255,255,255,.04); 
+}
+
+.notif-item.unread { 
+    background:rgba(249,115,22,.04); 
+}
+
+.notif-icon {
+    width:36px; height:36px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; font-size:.85rem;
+}
+.notif-icon.orange { 
+    background:rgba(249,115,22,.15); 
+    color:#f97316; 
+}
+
+.notif-icon.green  { 
+    background:rgba(34,197,94,.15);  
+    color:#22c55e; 
+}
+
+.notif-icon.purple { 
+    background:rgba(129,140,248,.15);
+    color:#818cf8; 
+}
+
+.notif-icon.blue   { 
+    background:rgba(56,189,248,.15); 
+    color:#38bdf8; 
+}
+
+.notif-icon.red    { 
+    background:rgba(239,68,68,.15);  
+    color:#f87171; 
+}
+
+.notif-text { 
+    font-size:.82rem; 
+    color:#94a3b8; 
+    line-height:1.5; flex:1; min-width:0; 
+}
+
+.notif-text strong { 
+    color:#e2e8f0; 
+    font-weight:600; 
+    display:block; 
+    margin-bottom:2px; 
+}
+
+.notif-time { 
+    font-size:.7rem; 
+    color:#475569; 
+    margin-top:3px; 
+}
+
+.notif-empty {
+    padding:2.5rem 1rem; text-align:center; color:#475569;
+}
+
+.notif-empty i { 
+    font-size:2rem; 
+    margin-bottom:.6rem; 
+    display:block; 
+    opacity:.3; 
+}

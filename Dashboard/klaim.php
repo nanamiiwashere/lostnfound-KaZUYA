@@ -53,8 +53,11 @@ $klaimList = $stmt->fetchAll();
       <button onclick="document.getElementById('sidebar').classList.toggle('open')" class="d-lg-none" style="background:none;border:none;color:#e2e8f0;font-size:1.1rem;padding:0;cursor:pointer;"><i class="fas fa-bars"></i></button>
       <span style="font-family:'Clash Display',sans-serif;font-weight:700;color:#fff;">Riwayat Klaim</span>
     </div>
+        <div class="d-flex align-items-center gap-2">
+      <?php require_once 'partials/notification.php'; ?>
     <a href="barang-temuan.php" class="btn-accent"><i class="fas fa-search"></i>Cari Barang</a>
   </div>
+</div>
 
   <div class="page-content">
 

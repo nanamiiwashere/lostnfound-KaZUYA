@@ -209,7 +209,7 @@ $categories = ['Electronics','Bags','Documents','Accessories','Clothing','Jewelr
                 </form>
               </td>
               <td>
-                <a href="pencocokan.php?action=add&id_barang=<?= $b['id_barang'] ?>" class="btn-ghost-sm" title="Cocokkan"><i class="fas fa-link"></i></a>
+                <a href="staff-pencocokan.php?action=add&id_barang=<?= $b['id_barang'] ?>" class="btn-ghost-sm" title="Cocokkan"><i class="fas fa-link"></i></a>
               </td>
             </tr>
             <?php endforeach; ?>

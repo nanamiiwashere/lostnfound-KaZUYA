@@ -93,13 +93,13 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
       <?php endif; ?>
     </div>
 
-    <!-- Mobile hamburger -->
+   
     <button onclick="toggleMobileMenu()" class="lg:hidden text-gray-300 p-2" style="background:none;border:none;">
       <i class="fas fa-bars text-lg" id="hamburgerIcon"></i>
     </button>
   </div>
  
-  <!-- Mobile menu -->
+
   <div id="mobileMenu" class="hidden lg:hidden border-t px-4 py-3" style="border-color:rgba(255,255,255,.07);background:rgba(8,12,20,.97);">
     <ul class="list-none m-0 p-0 flex flex-col gap-1 mb-3">
       <li><a href="index.php"  class="nav-link block">Beranda</a></li>
@@ -120,7 +120,7 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
   </div>
 </nav>
 
-<!-- ══ HERO ══ -->
+
 <section class="hero">
   <div class="container position-relative">
     <div class="row align-items-center g-5">
@@ -141,7 +141,7 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
           <?php endif; ?>
         </p>
 
-        <!-- Search — PUBLIC, everyone can use -->
+
         <div class="search-bar mb-4">
           <input type="text" id="heroSearch" placeholder="Cari kehilangan kunci, dompet, kartu ..."/>
           <button onclick="location.href='items.php?q='+document.getElementById('heroSearch').value">
@@ -149,21 +149,21 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
           </button>
         </div>
 
-        <!-- CTA — changes based on login state -->
+  
         <div class="d-flex flex-wrap gap-3">
           <?php if (isLoggedIn()): ?>
-            <!-- Logged in: can post -->
+            
             <a href="./dashboard/buat-laporan.php"         class="btn-primary-custom"><i class="fas fa-plus-circle"></i> Report Item</a>
             <a href="items.php?type=found"  class="btn-ghost-custom"><i class="fas fa-hand-holding"></i> Found Items</a>
           <?php else: ?>
-            <!-- Guest: explore only, nudge to register -->
+   
             <a href="items.php"             class="btn-primary-custom"><i class="fas fa-search"></i> Explore Items</a>
             <a href="/register.php"     class="btn-ghost-custom"><i class="fas fa-user-plus"></i> Register to Post</a>
           <?php endif; ?>
         </div>
       </div>
 
-      <!-- Stats -->
+
       <div class="col-lg-6">
         <div class="row g-3">
           <?php foreach([
@@ -195,7 +195,7 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
   </div>
 </section>
 
-<!-- ══ RECENT ITEMS — PUBLIC ══ -->
+
 <section class="py-5 mt-2">
   <div class="container">
     <div class="d-flex justify-content-between align-items-end mb-4">
@@ -206,7 +206,7 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
       <a href="items.php" class="btn-ghost-custom py-2 px-4" style="font-size:.85rem;">View All <i class="fas fa-arrow-right ms-1"></i></a>
     </div>
 
-    <!-- Filter — PUBLIC -->
+
     <div class="d-flex gap-2 mb-4 flex-wrap">
       <button class="filter-tab active" onclick="filterItems('all',this)">All Items</button>
       <button class="filter-tab" onclick="filterItems('lost',this)">
@@ -256,7 +256,6 @@ $resolved   = $pdo->query("SELECT COUNT(*) FROM barang_temuan WHERE status='reso
             </div>
 
             <?php if (isLoggedIn()): ?>
-              <!-- ✅ LOGGED IN: full action buttons -->
               <div class="d-flex gap-2">
                 <a href="item-detail.php?id=<?= $item['id_barang'] ?>"
                    class="btn btn-sm flex-grow-1 fw-600"

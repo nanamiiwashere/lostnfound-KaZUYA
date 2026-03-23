@@ -476,3 +476,191 @@
 
     .news-card-full { animation: fadeUp .4s ease both; }
     @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+
+
+    /* about */
+    .hero-scene {
+      perspective: 800px;
+      display: flex; align-items: center; justify-content: center;
+      height: 420px;
+    }
+    .hero-object {
+      position: relative;
+      width: 280px; height: 280px;
+      transform-style: preserve-3d;
+      transition: transform 0.08s ease-out;
+      cursor: none;
+    }
+    .card-3d {
+      position: absolute;
+      border-radius: 24px;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px;
+      font-family: 'Clash Display', sans-serif;
+      font-weight: 700; color: #fff;
+      box-shadow: 0 30px 60px rgba(0,0,0,.5);
+      transition: transform 0.4s cubic-bezier(.34,1.56,.64,1);
+    }
+    .card-main {
+      width: 220px; height: 220px;
+      background: linear-gradient(135deg, #1a2332, #111927);
+      border: 1px solid rgba(255,255,255,.12);
+      top: 30px; left: 30px;
+      animation: floatMain 4s ease-in-out infinite;
+    }
+    .card-main i { font-size: 3.5rem; color: #f97316; }
+    .card-main span { font-size: 1.1rem; color: #e2e8f0; }
+
+    .card-badge-1 {
+      width: 80px; height: 80px; font-size: .72rem;
+      background: linear-gradient(135deg, rgba(249,115,22,.9), rgba(251,146,60,.9));
+      top: -10px; left: -10px;
+      animation: floatBadge1 3.5s ease-in-out infinite;
+      text-align: center; font-size: .68rem;
+    }
+    .card-badge-2 {
+      width: 90px; height: 90px;
+      background: linear-gradient(135deg, rgba(34,197,94,.85), rgba(16,185,129,.85));
+      bottom: -15px; right: -5px;
+      animation: floatBadge2 4.2s ease-in-out infinite;
+      font-size: .68rem; text-align: center;
+    }
+    .card-badge-3 {
+      width: 70px; height: 70px;
+      background: linear-gradient(135deg, rgba(129,140,248,.85), rgba(99,102,241,.85));
+      bottom: 10px; left: -20px;
+      animation: floatBadge3 3.8s ease-in-out infinite;
+      font-size: .65rem; text-align: center;
+    }
+    .card-line {
+      position: absolute;
+      width: 60px; height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(249,115,22,.5), transparent);
+      top: 50%; right: -40px;
+      animation: linePulse 2s ease-in-out infinite;
+    }
+
+    @keyframes floatMain   { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-12px) rotate(2deg)} }
+    @keyframes floatBadge1 { 0%,100%{transform:translateY(0) rotate(5deg)} 50%{transform:translateY(-8px) rotate(-3deg)} }
+    @keyframes floatBadge2 { 0%,100%{transform:translateY(0) rotate(-4deg)} 50%{transform:translateY(-10px) rotate(4deg)} }
+    @keyframes floatBadge3 { 0%,100%{transform:translateY(0) rotate(8deg)} 50%{transform:translateY(-6px) rotate(-5deg)} }
+    @keyframes linePulse    { 0%,100%{opacity:.3;width:40px} 50%{opacity:1;width:70px} }
+
+    .custom-cursor {
+      position: fixed;
+      width: 20px; height: 20px;
+      background: rgba(249,115,22,.8);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%,-50%);
+      transition: transform 0.15s ease, width 0.2s, height 0.2s, background 0.2s;
+      mix-blend-mode: screen;
+    }
+    .cursor-trail {
+      position: fixed;
+      width: 40px; height: 40px;
+      border: 1px solid rgba(249,115,22,.3);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%,-50%);
+      transition: transform 0.35s ease;
+    }
+
+
+    .about-hero {
+      min-height: 92vh;
+      display: flex; align-items: center;
+      background: radial-gradient(ellipse 70% 60% at 70% 50%, rgba(249,115,22,.1) 0%, transparent 65%),
+                  radial-gradient(ellipse 50% 50% at 20% 80%, rgba(34,197,94,.05) 0%, transparent 50%),
+                  var(--bg);
+      position: relative; overflow: hidden;
+    }
+    .about-hero::before {
+      content:'';position:absolute;inset:0;
+      background-image:radial-gradient(rgba(255,255,255,.025) 1px,transparent 1px);
+      background-size:40px 40px;
+    }
+    .stat-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px 16px;
+      transition: transform .2s, border-color .2s;
+    }
+    .stat-pill:hover { transform: translateY(-3px); border-color: rgba(249,115,22,.3); }
+    .stat-pill-num { font-family: 'Clash Display', sans-serif; font-weight: 700; font-size: 1.4rem; color: var(--accent); }
+    .stat-pill-lbl { font-size: .75rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+
+
+    .step-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 1.8rem;
+      position: relative; overflow: hidden;
+      transition: transform .3s, border-color .3s, box-shadow .3s;
+    }
+    .step-card:hover { transform: translateY(-8px); border-color: rgba(249,115,22,.2); box-shadow: 0 20px 40px rgba(0,0,0,.4); }
+    .step-card::before {
+      content: attr(data-step);
+      position: absolute; top: -10px; right: 16px;
+      font-family: 'Clash Display', sans-serif; font-size: 5rem;
+      font-weight: 700; color: rgba(249,115,22,.06);
+      line-height: 1; pointer-events: none;
+    }
+    .step-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1rem; font-size: 1.3rem;
+    }
+    .step-title { font-family: 'Clash Display', sans-serif; font-weight: 700; color: var(--text); margin-bottom: .4rem; }
+    .step-desc  { color: var(--muted); font-size: .88rem; line-height: 1.7; }
+
+
+    .feat-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 18px; padding: 1.5rem;
+      transition: transform .25s, border-color .25s;
+    }
+    .feat-card:hover { transform: translateY(-5px); border-color: rgba(249,115,22,.15); }
+
+
+    .timeline { position: relative; }
+    .timeline::before {
+      content: ''; position: absolute;
+      left: 20px; top: 0; bottom: 0; width: 2px;
+      background: linear-gradient(180deg, var(--accent), rgba(249,115,22,.1));
+    }
+    .tl-item { display: flex; gap: 1.5rem; margin-bottom: 2rem; position: relative; }
+    .tl-dot {
+      width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+      background: var(--card); border: 2px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent); font-size: .9rem; z-index: 1;
+    }
+    .tl-content { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1rem 1.2rem; flex: 1; }
+    .tl-year { font-size: .72rem; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+    .tl-title { font-family: 'Clash Display', sans-serif; font-weight: 700; color: var(--text); }
+    .tl-desc  { color: var(--muted); font-size: .85rem; margin-top: 4px; }
+
+
+    .team-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 18px; padding: 1.5rem; text-align: center;
+      transition: transform .25s, border-color .25s;
+    }
+    .team-card:hover { transform: translateY(-6px); border-color: rgba(249,115,22,.2); }
+    .team-avatar {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: linear-gradient(135deg, rgba(249,115,22,.2), rgba(249,115,22,.05));
+      border: 2px solid rgba(249,115,22,.3);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem; font-size: 1.8rem; color: var(--accent);
+    }
+
+
+    .fade-in-up { opacity: 0; transform: translateY(30px); transition: opacity .6s ease, transform .6s ease; }
+    .fade-in-up.visible { opacity: 1; transform: none; }
+    .delay-1 { transition-delay: .1s; }
+    .delay-2 { transition-delay: .2s; }
+    .delay-3 { transition-delay: .3s; }
+    .delay-4 { transition-delay: .4s; }

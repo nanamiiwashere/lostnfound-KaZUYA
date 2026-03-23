@@ -106,7 +106,7 @@ $pencocokan = $pdo->query("
     </div>
     <button onclick="toggleForm()" class="btn-accent" style="background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.2);"><i class="fas fa-plus"></i>Buat Pencocokan</button>
   </div>
-
+ 
   <div class="page-content">
     <?php if ($success): ?>
       <div class="alert-success mb-4"><i class="fas fa-check-circle me-2"></i><?= $success ?></div>
@@ -114,8 +114,8 @@ $pencocokan = $pdo->query("
     <?php if ($error): ?>
       <div class="alert-error mb-4"><i class="fas fa-exclamation-circle me-2"></i><?= $error ?></div>
     <?php endif; ?>
-
-
+ 
+ 
     <div id="formPencocokan" class="dash-card p-4 mb-4" style="<?= $showForm?'':'display:none;' ?>">
       <div style="font-family:'Clash Display',sans-serif;font-weight:700;color:#fff;margin-bottom:1.2rem;">
         <i class="fas fa-link me-2" style="color:#818cf8;"></i>Buat Pencocokan Baru
@@ -162,8 +162,8 @@ $pencocokan = $pdo->query("
         </div>
       </form>
     </div>
-
-
+ 
+ 
     <div class="dash-card">
       <div class="dash-card-header">
         <span class="dash-card-title"><i class="fas fa-link me-2" style="color:#818cf8;"></i>Riwayat Pencocokan <span style="color:#64748b;font-size:.8rem;font-weight:400;">(<?= count($pencocokan) ?> entri)</span></span>
@@ -196,24 +196,40 @@ $pencocokan = $pdo->query("
                 </span>
               </td>
               <td>
-                <?php if ($p['status_verifikasi'] === 'process'): ?>
-                <form method="POST" class="d-flex gap-1">
-                  <input type="hidden" name="id_pencocokan" value="<?= $p['id_pencocokan'] ?>"/>
-                  <input type="hidden" name="update_verifikasi" value="1"/>
-                  <button name="status_verifikasi" value="approved" type="submit" class="btn-accent" style="background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:5px 10px;font-size:.75rem;">
-                    <i class="fas fa-check"></i>Verifikasi
+                <div class="d-flex gap-1 flex-wrap">
+                  <button class="btn-ghost-sm" onclick="openDetail(<?= $p['id_pencocokan'] ?>, <?= htmlspecialchars(json_encode([
+                    'nama_barang'       => $p['nama_barang'] ?? '—',
+                    'lokasi_ditemukan'  => $p['lokasi_ditemukan'] ?? '—',
+                    'barang_image'      => $p['barang_image'] ?? '',
+                    'category'          => $p['category'] ?? 'Other',
+                    'nama_laporan'      => $p['nama_laporan'] ?? '—',
+                    'lokasi_kehilangan' => $p['lokasi_kehilangan'] ?? '—',
+                    'deskripsi_laporan' => $p['deskripsi_laporan'] ?? '—',
+                    'nama_pelapor'      => $p['nama_pelapor'] ?? '—',
+                    'email_pelapor'     => $p['email_pelapor'] ?? '—',
+                    'note'              => $p['note'] ?? '',
+                    'tanggal'           => date('d M Y, H:i', strtotime($p['tanggal_pencocokan'])),
+                    'status'            => $p['status_verifikasi'],
+                  ]), ENT_QUOTES) ?>)">
+                    <i class="fas fa-eye"></i>Detail
                   </button>
-                  <button name="status_verifikasi" value="rejected" type="submit" class="btn-ghost-sm" style="color:#f87171;border-color:rgba(239,68,68,.2);">
-                    <i class="fas fa-times"></i>Tolak
-                  </button>
-                </form>
-                <?php elseif ($p['status_verifikasi'] === 'approved'): ?>
-                  <a href="serah-terima.php?action=add&id_pencocokan=<?= $p['id_pencocokan'] ?>" class="btn-ghost-sm" style="color:#f97316;">
-                    <i class="fas fa-handshake"></i>Serah Terima
-                  </a>
-                <?php else: ?>
-                  <span style="color:#475569;font-size:.78rem;">—</span>
-                <?php endif; ?>
+                  <?php if ($p['status_verifikasi'] === 'process'): ?>
+                  <form method="POST" class="d-flex gap-1">
+                    <input type="hidden" name="id_pencocokan" value="<?= $p['id_pencocokan'] ?>"/>
+                    <input type="hidden" name="update_verifikasi" value="1"/>
+                    <button name="status_verifikasi" value="approved" type="submit" class="btn-accent" style="background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3);padding:5px 10px;font-size:.75rem;">
+                      <i class="fas fa-check"></i>Verifikasi
+                    </button>
+                    <button name="status_verifikasi" value="rejected" type="submit" class="btn-ghost-sm" style="color:#f87171;border-color:rgba(239,68,68,.2);">
+                      <i class="fas fa-times"></i>Tolak
+                    </button>
+                  </form>
+                  <?php elseif ($p['status_verifikasi'] === 'approved'): ?>
+                    <a href="staff-serah.php?action=add&id_pencocokan=<?= $p['id_pencocokan'] ?>" class="btn-ghost-sm" style="color:#f97316;">
+                      <i class="fas fa-handshake"></i>Serah Terima
+                    </a>
+                  <?php endif; ?>
+                </div>
               </td>
             </tr>
             <?php endforeach; ?>
@@ -224,13 +240,78 @@ $pencocokan = $pdo->query("
     </div>
   </div>
 </div>
-
+ 
+<!-- Modal Detail Klaim -->
+<div id="detailModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto;">
+  <div class="dash-card p-4" style="width:100%;max-width:540px;margin:auto;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div style="font-family:'Clash Display',sans-serif;font-weight:700;color:#fff;font-size:1.05rem;">
+        <i class="fas fa-file-alt me-2" style="color:#818cf8;"></i>Detail Pencocokan
+      </div>
+      <button onclick="closeDetail()" style="background:none;border:none;color:#64748b;font-size:1.1rem;cursor:pointer;"><i class="fas fa-times"></i></button>
+    </div>
+ 
+    <!-- Barang Temuan -->
+    <div style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.15);border-radius:12px;padding:1rem;margin-bottom:.8rem;">
+      <div style="color:#64748b;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;"><i class="fas fa-box-open me-1" style="color:#22c55e;"></i>Barang Temuan</div>
+      <div id="d_nama_barang" style="color:#fff;font-weight:700;font-size:.95rem;"></div>
+      <div id="d_lokasi_ditemukan" style="color:#64748b;font-size:.8rem;margin-top:3px;"><i class="fas fa-map-marker-alt me-1" style="color:#f97316;"></i></div>
+    </div>
+ 
+    <!-- Laporan User -->
+    <div style="background:rgba(129,140,248,.05);border:1px solid rgba(129,140,248,.15);border-radius:12px;padding:1rem;margin-bottom:.8rem;">
+      <div style="color:#64748b;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;"><i class="fas fa-file-alt me-1" style="color:#818cf8;"></i>Laporan Kehilangan</div>
+      <div id="d_nama_laporan" style="color:#fff;font-weight:700;font-size:.95rem;"></div>
+      <div id="d_lokasi_kehilangan" style="color:#64748b;font-size:.8rem;margin-top:3px;"><i class="fas fa-map-marker-alt me-1" style="color:#f97316;"></i></div>
+      <div id="d_deskripsi_laporan" style="color:#94a3b8;font-size:.82rem;margin-top:6px;line-height:1.6;"></div>
+    </div>
+ 
+    <!-- Alasan Klaim -->
+    <div style="background:rgba(249,115,22,.05);border:1px solid rgba(249,115,22,.15);border-radius:12px;padding:1rem;margin-bottom:.8rem;">
+      <div style="color:#64748b;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;"><i class="fas fa-comment-alt me-1" style="color:#f97316;"></i>Alasan / Bukti Klaim</div>
+      <div id="d_note" style="color:#e2e8f0;font-size:.88rem;line-height:1.7;font-style:italic;"></div>
+    </div>
+ 
+    <!-- Info Pelapor -->
+    <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:1rem;margin-bottom:1rem;">
+      <div style="color:#64748b;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;"><i class="fas fa-user me-1"></i>Pelapor</div>
+      <div class="d-flex justify-content-between flex-wrap gap-2">
+        <div>
+          <div id="d_nama_pelapor" style="color:#fff;font-weight:600;font-size:.88rem;"></div>
+          <div id="d_email_pelapor" style="color:#64748b;font-size:.78rem;"></div>
+        </div>
+        <div style="text-align:right;">
+          <div style="color:#64748b;font-size:.72rem;">Tanggal Klaim</div>
+          <div id="d_tanggal" style="color:#94a3b8;font-size:.78rem;"></div>
+        </div>
+      </div>
+    </div>
+ 
+    <button onclick="closeDetail()" class="btn-ghost-sm w-100" style="justify-content:center;">Tutup</button>
+  </div>
+</div>
+ 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 function toggleForm() {
   const f = document.getElementById('formPencocokan');
   f.style.display = f.style.display === 'none' ? 'block' : 'none';
 }
+function openDetail(id, data) {
+  document.getElementById('d_nama_barang').textContent      = data.nama_barang;
+  document.getElementById('d_lokasi_ditemukan').innerHTML   = '<i class="fas fa-map-marker-alt me-1" style="color:#f97316;"></i>' + data.lokasi_ditemukan;
+  document.getElementById('d_nama_laporan').textContent     = data.nama_laporan;
+  document.getElementById('d_lokasi_kehilangan').innerHTML  = '<i class="fas fa-map-marker-alt me-1" style="color:#f97316;"></i>' + data.lokasi_kehilangan;
+  document.getElementById('d_deskripsi_laporan').textContent = data.deskripsi_laporan || '—';
+  document.getElementById('d_note').textContent             = data.note || '(Tidak ada keterangan tambahan)';
+  document.getElementById('d_nama_pelapor').textContent     = data.nama_pelapor;
+  document.getElementById('d_email_pelapor').textContent    = data.email_pelapor;
+  document.getElementById('d_tanggal').textContent          = data.tanggal;
+  const m = document.getElementById('detailModal');
+  m.style.display = 'flex';
+}
+function closeDetail() { document.getElementById('detailModal').style.display = 'none'; }
+document.getElementById('detailModal').addEventListener('click', function(e){ if(e.target===this) closeDetail(); });
 </script>
 </body>
 </html>

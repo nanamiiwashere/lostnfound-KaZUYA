@@ -42,7 +42,7 @@ $recentItems = $stmt -> fetchAll();
     <link rel="stylesheet" href="../dashboard/partials/style.css">
 </head>
 <body>
- 
+
 <?php require_once 'partials/sidebar.php'; ?>
  
 <div class="main-wrap">
@@ -57,8 +57,11 @@ $recentItems = $stmt -> fetchAll();
         <span style="color:#64748b;font-size:.82rem;margin-left:8px;">Halo, <?= htmlspecialchars(strtok($u['name']??'User',' ')) ?>!</span>
       </div>
     </div>
+        <div class="d-flex align-items-center gap-2">
+      <?php require_once 'partials/notification.php'; ?>
     <a href="buat-laporan.php" class="btn-accent"><i class="fas fa-plus"></i>Buat Laporan</a>
   </div>
+</div>
  
   <div class="page-content">
  

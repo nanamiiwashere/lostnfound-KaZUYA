@@ -2,7 +2,24 @@
 require_once './connect.php';
 require_once './Auth/auth3thparty.php';
 
-$items = $pdo->query("SELECT * FROM barang_temuan ORDER BY created_at DESC")->fetchAll();
+$q = trim($_GET['q'] ?? '');
+$catF = $_GET['category'] ?? 'all';
+$where = ["type='found'", "status IN ('open','resolved')"];
+$params = [];
+
+if ($catF !== 'all'){
+  $where[] = "category=?";
+  $params[] = $catF;
+}
+if ($q !== ''){
+  $where[] = "(nama_barang LIKE ? OR deskripsi LIKE ? OR lokasi_ditemukan LIKE ?)";
+  $params[] = "%$q%"; $params[] = "%$q%"; $params[] = "%$q%";
+}
+
+$whereSQL = 'WHERE ' . implode(' AND ', $where);
+$stmt = $pdo -> prepare("SELECT * FROM barang_temuan $whereSQL ORDER BY created_at DESC");
+$stmt -> execute($params);
+$items = $stmt -> fetchAll();
  
 $catIcons = [
     'Electronics'=>'fa-mobile-alt','Accessories'=>'fa-wallet',
@@ -44,15 +61,16 @@ $catIcons = [
         <a href="Dashboard/buat-laporan.php" class="btn-nav-accent" onclick="startProgress()">
           <i class="fas fa-plus me-1"></i>Lapor Kehilangan
         </a>
+        <!-- Avatar dropdown -->
         <div class="relative" id="avatarWrap">
           <button onclick="toggleDropdown()" class="btn-avatar">
             <?php if (!empty($u['avatar'])): ?>
-                <?php
-                    $av = $u['avatar'] ?? '';
-                    $avSrc = str_starts_with($av, 'http') ? $av : 'uploads/' . $av;?>
+              <?php
+                $av = $u['avatar'] ?? '';
+                $avSrc = str_starts_with($av, 'http') ? $av : 'uploads/' . $av;?>
               <img src="<?= htmlspecialchars($avSrc) ?>" class="avatar-img" alt=""/>
             <?php else: ?>
-              <div class="avatar-initial"><i class="fas fa-user" style="font-size:.85rem;"></i></div>
+              <div class="avatar-initial"><?= strtoupper(substr($u['name'],0,1)) ?></div>
             <?php endif; ?>
           </button>
           <div id="avatarDropdown" class="hidden absolute right-0 mt-2 w-52 rounded-2xl py-2 z-50"
@@ -178,7 +196,7 @@ $catIcons = [
              data-location="<?= strtolower(htmlspecialchars($item['lokasi_ditemukan'])) ?>"
              data-category="<?= strtolower($item['category']??'') ?>"
              style="animation-delay:<?= min($i * .04, .4) ?>s;">
-          <div class="item-card h-100" onclick="location.href='item-detail.php?id=<?= $item['id_barang'] ?>'">
+          <div class="item-card h-100" onclick="location.href='./dashboard/item-detail.php?id=<?= $item['id_barang'] ?>'">
             <div class="item-card-img-wrap">
               <?php if (!empty($item['image'])): ?>
                 <img src="./uploads/<?= htmlspecialchars($item['image']) ?>" class="item-card-img" alt=""/>
@@ -205,7 +223,7 @@ $catIcons = [
                 <i class="fas fa-calendar me-1"></i><?= date('d M Y', strtotime($item['created_at'])) ?>
               </div>
               <?php if (isLoggedIn()): ?>
-                <a href="item-detail.php?id=<?= $item['id_barang'] ?>"
+                <a href="./dashboard/item-detail.php?id=<?= $item['id_barang'] ?>"
                    class="btn btn-sm w-100 fw-600"
                    style="background:rgba(249,115,22,.15);color:var(--accent);border-radius:8px;border:1px solid rgba(249,115,22,.2);"
                    onclick="event.stopPropagation()">
