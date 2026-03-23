@@ -47,10 +47,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['claim'])) {
         if (!$cekLaporan->fetch()) {
             $claimError = 'Laporan tidak valid.';
         } else {
-            $cekClaim = $pdo->prepare("SELECT * FROM pencocokan WHERE id_laporan=? AND id_barang=?");
+            // Cek klaim aktif saja — rejected boleh klaim ulang
+            $cekClaim = $pdo->prepare("SELECT * FROM pencocokan WHERE id_laporan=? AND id_barang=? AND status_verifikasi IN ('process','approved')");
             $cekClaim->execute([$idLaporan, $id]);
             if ($cekClaim->fetch()) {
-                $claimError = 'Kamu sudah pernah mengajukan klaim untuk barang ini.';
+                $claimError = 'Kamu sudah pernah mengajukan klaim aktif untuk barang ini.';
             } else {
 
                 $pdo->prepare("

@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
                 <div class="form-group">
                   <label>Kategori</label>
                   <select name="category" class="form-input">
-                    <?php foreach(['Electronics','Accessories','Bags','Keys','Documents','Pets','Jewelry','Other'] as $cat): ?>
+                    <?php foreach(['Electronics','Accessories','Bags', 'Clothing','Keys','Documents','Pets','Jewelry','Other'] as $cat): ?>
                       <option value="<?= $cat ?>" <?= ($_POST['category']??'')===$cat?'selected':'' ?>><?= $cat ?></option>
                     <?php endforeach; ?>
                   </select>

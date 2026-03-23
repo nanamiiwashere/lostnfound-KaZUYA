@@ -85,6 +85,7 @@ $pencocokan = $pdo->query("
     ORDER BY p.tanggal_pencocokan DESC
 ")->fetchAll();
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -174,7 +175,7 @@ $pencocokan = $pdo->query("
       <div style="overflow-x:auto;">
         <table class="dash-table">
           <thead><tr>
-            <th>#</th><th>Barang Temuan</th><th>Laporan</th><th>Pelapor</th><th>Alasan Klaim</th><th>Tanggal</th><th>Status</th><th>Aksi</th>
+            <th>#</th><th>Barang Temuan</th><th>Laporan</th><th>Pelapor</th><th>Tanggal</th><th>Status</th><th>Aksi</th>
           </tr></thead>
           <tbody>
             <?php foreach($pencocokan as $p): ?>

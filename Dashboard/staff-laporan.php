@@ -38,7 +38,7 @@ $statTotal = (int)$pdo -> query("SELECT COUNT(*) FROM laporan_kehilangan") -> fe
 $statOpen = (int)$pdo -> query("SELECT COUNT(*) FROM laporan_kehilangan WHERE status='open'") -> fetchColumn();
 $statResolved = (int)$pdo ->query("SELECT COUNT(*) FROM laporan_kehilangan WHERE status='resolved' OR status='closed'") -> fetchColumn();
 
-$laporan = $pdo->prepare("SELECT l.*, u.nama AS nama_pelapor FROM laporan_kehilangan l LEFT JOIN users u ON l.id_pelapor=u.id_user WHERE $whereSQL ORDER BY l.created_at DESC");
+$laporan = $pdo->prepare("SELECT l.*, u.nama AS nama_pelapor, u.email AS email_pelapor FROM laporan_kehilangan l LEFT JOIN users u ON l.id_pelapor=u.id_user WHERE $whereSQL ORDER BY l.created_at DESC");
 $laporan->execute($params);
 $items = $laporan->fetchAll();
 
@@ -60,17 +60,18 @@ $updated = isset($_GET['updated']);
 <div class="main-wrap">
   <div class="topbar">
     <div class="d-flex align-items-center gap-3">
-    <div>
+      <button onclick="document.getElementById('sidebar').classList.toggle('open')" class="d-lg-none" style="background:none;border:none;color:#e2e8f0;font-size:1.1rem;padding:0;cursor:pointer;"><i class="fas fa-bars"></i></button>
+      <div>
         <span style="font-family:'Clash Display',sans-serif;font-weight:700;color:#fff;">Laporan Kehilangan</span>
         <span style="color:#64748b;font-size:.82rem;margin-left:8px;">Halo, <?= htmlspecialchars(strtok($u['name']??'User',' ')) ?>!</span>
       </div>
-      <button onclick="document.getElementById('sidebar').classList.toggle('open')" class="d-lg-none" style="background:none;border:none;color:#e2e8f0;font-size:1.1rem;padding:0;cursor:pointer;"><i class="fas fa-bars"></i></button>
     </div>
   </div>
-
+ 
   <div class="page-content">
-    <!--stats-->
-        <div class="row g-3 mb-4">
+ 
+
+    <div class="row g-3 mb-4">
       <div class="col-6 col-xl-4">
         <div class="stat-card">
           <div class="stat-icon" style="background:rgba(249,115,22,.12);"><i class="fas fa-file-alt" style="color:#f97316;"></i></div>
@@ -100,10 +101,11 @@ $updated = isset($_GET['updated']);
       </div>
     </div>
  
-
     <?php if ($updated): ?>
       <div class="alert-success mb-4"><i class="fas fa-check-circle me-2"></i>Laporan berhasil diupdate.</div>
     <?php endif; ?>
+ 
+
     <form method="GET" class="dash-card p-3 mb-4">
       <div class="row g-2 align-items-end">
         <div class="col-md-4">
@@ -134,6 +136,7 @@ $updated = isset($_GET['updated']);
         <?php endif; ?>
       </div>
     </form>
+ 
 
     <div class="dash-card">
       <div class="dash-card-header">
@@ -161,9 +164,27 @@ $updated = isset($_GET['updated']);
               <td><span class="bdg bdg-<?= $item['type'] ?>"><?= strtoupper($item['type']) ?></span></td>
               <td><span class="bdg bdg-<?= $item['status'] ?>"><?= ucfirst($item['status']) ?></span></td>
               <td>
-                <button class="btn-ghost-sm" onclick="openEditModal(<?= $item['id_laporan'] ?>,'<?= $item['status'] ?>','<?= $item['type'] ?>')">
-                  <i class="fas fa-edit"></i>Edit
-                </button>
+                <div class="d-flex gap-2">
+                  <button class="btn-ghost-sm" onclick='openDetailModal(<?= json_encode([
+                    "id"          => $item["id_laporan"],
+                    "nama_barang" => $item["nama_barang"],
+                    "category"    => $item["category"] ?? "Other",
+                    "type"        => $item["type"],
+                    "status"      => $item["status"],
+                    "deskripsi"   => $item["deskripsi"] ?? "",
+                    "lokasi"      => $item["lokasi_kehilangan"],
+                    "tanggal"     => date("d F Y", strtotime($item["tanggal_kehilangan"])),
+                    "dilaporkan"  => date("d F Y, H:i", strtotime($item["created_at"])),
+                    "pelapor"     => $item["nama_pelapor"] ?? "—",
+                    "email"       => $item["email_pelapor"] ?? "",
+                    "image"       => $item["image"] ?? "",
+                  ]) ?>)'>
+                    <i class="fas fa-eye"></i>Detail
+                  </button>
+                  <button class="btn-ghost-sm" onclick="openEditModal(<?= $item['id_laporan'] ?>,'<?= $item['status'] ?>','<?= $item['type'] ?>')">
+                    <i class="fas fa-edit"></i>Edit
+                  </button>
+                </div>
               </td>
             </tr>
             <?php endforeach; ?>
@@ -174,6 +195,59 @@ $updated = isset($_GET['updated']);
     </div>
   </div>
 </div>
+ 
+
+<div id="detailModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:998;align-items:center;justify-content:center;padding:1rem;">
+  <div class="dash-card" style="width:100%;max-width:560px;max-height:90vh;overflow-y:auto;">
+    <div class="dash-card-header">
+      <span class="dash-card-title"><i class="fas fa-file-alt me-2" style="color:#818cf8;"></i>Detail Laporan</span>
+      <button onclick="closeDetailModal()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:1.1rem;padding:0;"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="p-4">
+
+      <div id="detail_img_wrap" style="display:none;margin-bottom:1rem;">
+        <img id="detail_img" src="" class="w-100 rounded-3" style="max-height:220px;object-fit:cover;" alt="foto barang"/>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+        <h5 id="detail_nama" style="font-family:'Clash Display',sans-serif;color:#fff;margin:0;"></h5>
+        <div class="d-flex gap-2 flex-wrap" id="detail_badges"></div>
+      </div>
+ 
+
+      <div class="row g-3">
+        <div class="col-12">
+          <div style="color:#64748b;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Deskripsi</div>
+          <div id="detail_deskripsi" style="color:#e2e8f0;font-size:.9rem;line-height:1.6;"></div>
+        </div>
+        <div class="col-sm-6">
+          <div style="color:#64748b;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;"><i class="fas fa-map-marker-alt me-1" style="color:#f97316;"></i>Lokasi</div>
+          <div id="detail_lokasi" style="color:#e2e8f0;font-size:.9rem;"></div>
+        </div>
+        <div class="col-sm-6">
+          <div style="color:#64748b;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;"><i class="fas fa-calendar me-1" style="color:#f97316;"></i>Tanggal Kejadian</div>
+          <div id="detail_tanggal" style="color:#e2e8f0;font-size:.9rem;"></div>
+        </div>
+        <div class="col-sm-6">
+          <div style="color:#64748b;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;"><i class="fas fa-clock me-1" style="color:#f97316;"></i>Dilaporkan</div>
+          <div id="detail_dilaporkan" style="color:#e2e8f0;font-size:.9rem;"></div>
+        </div>
+        <div class="col-sm-6">
+          <div style="color:#64748b;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;"><i class="fas fa-user me-1" style="color:#f97316;"></i>Pelapor</div>
+          <div id="detail_pelapor" style="color:#e2e8f0;font-size:.9rem;"></div>
+        </div>
+      </div>
+ 
+      <div class="d-flex gap-2 mt-4">
+        <button id="detail_edit_btn" class="btn-accent flex-fill" style="justify-content:center;">
+          <i class="fas fa-edit"></i>Edit Status
+        </button>
+        <button onclick="closeDetailModal()" class="btn-ghost-sm">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
 
 <div id="editModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;align-items:center;justify-content:center;">
   <div class="dash-card p-4" style="width:100%;max-width:380px;margin:1rem;">
@@ -205,18 +279,82 @@ $updated = isset($_GET['updated']);
     </form>
   </div>
 </div>
-
+ 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+
+function openDetailModal(data) {
+  document.getElementById('detail_nama').textContent = data.nama_barang;
+ 
+
+  const bdgColors = {
+    lost:     'bdg-lost',
+    found:    'bdg-found',
+    open:     'bdg-open',
+    resolved: 'bdg-resolved',
+    closed:   'bdg-closed',
+    pending:  'bdg-pending',
+  };
+  const badgesEl = document.getElementById('detail_badges');
+  badgesEl.innerHTML = `
+    <span class="bdg ${bdgColors[data.type]??''}">${data.type.toUpperCase()}</span>
+    <span class="bdg ${bdgColors[data.status]??''}">${data.status.charAt(0).toUpperCase()+data.status.slice(1)}</span>
+    <span class="bdg" style="background:rgba(255,255,255,.06);color:#94a3b8;border:1px solid rgba(255,255,255,.08);">${data.category}</span>
+  `;
+ 
+  const imgWrap = document.getElementById('detail_img_wrap');
+  const img     = document.getElementById('detail_img');
+  if (data.image) {
+    img.src = '../uploads/' + data.image;
+    imgWrap.style.display = 'block';
+  } else {
+    imgWrap.style.display = 'none';
+  }
+ 
+  document.getElementById('detail_deskripsi').textContent  = data.deskripsi || 'Tidak ada deskripsi.';
+  document.getElementById('detail_lokasi').textContent     = data.lokasi;
+  document.getElementById('detail_tanggal').textContent    = data.tanggal;
+  document.getElementById('detail_dilaporkan').textContent = data.dilaporkan;
+ 
+
+  const pelapor = document.getElementById('detail_pelapor');
+  pelapor.innerHTML = data.email
+    ? `${data.pelapor}<br><a href="mailto:${data.email}" style="color:#f97316;font-size:.82rem;text-decoration:none;"><i class="fas fa-envelope me-1"></i>${data.email}</a>`
+    : data.pelapor;
+ 
+
+  document.getElementById('detail_edit_btn').onclick = function() {
+    closeDetailModal();
+    openEditModal(data.id, data.status, data.type);
+  };
+ 
+  const m = document.getElementById('detailModal');
+  m.style.display = 'flex';
+}
+ 
+function closeDetailModal() {
+  document.getElementById('detailModal').style.display = 'none';
+}
+ 
+document.getElementById('detailModal').addEventListener('click', function(e) {
+  if (e.target === this) closeDetailModal();
+});
+ 
 function openEditModal(id, status, type) {
-  document.getElementById('modal_id').value = id;
+  document.getElementById('modal_id').value     = id;
   document.getElementById('modal_status').value = status;
-  document.getElementById('modal_type').value = type;
+  document.getElementById('modal_type').value   = type;
   const m = document.getElementById('editModal');
   m.style.display = 'flex';
 }
-function closeModal() { document.getElementById('editModal').style.display = 'none'; }
-document.getElementById('editModal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+ 
+function closeModal() {
+  document.getElementById('editModal').style.display = 'none';
+}
+ 
+document.getElementById('editModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
 </script>
 </body>
 </html>

@@ -4,8 +4,22 @@
       --accent:  #f97316; --green: #22c55e; --red: #ef4444;
       --text:    #e2e8f0; --muted: #64748b;
     }
-    body { font-family:'Cabinet Grotesk',sans-serif; background:var(--bg); color:var(--text); overflow-x:hidden; }
-    h1,h2,h3,h4,h5 { font-family:'Clash Display',sans-serif; }
+    body { 
+      font-family:'Cabinet Grotesk',sans-serif; 
+      background:var(--bg); 
+      color:var(--text); 
+      overflow-x:hidden; 
+    }
+
+    h1,h2,h3,h4,h5 { 
+      font-family:'Clash Display',sans-serif; 
+    }
+
+    .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    }
+
     .accent { color:var(--accent); }
 
     /* Navbar */
@@ -664,3 +678,6 @@
     .delay-2 { transition-delay: .2s; }
     .delay-3 { transition-delay: .3s; }
     .delay-4 { transition-delay: .4s; }
+
+
+  .hero { padding-top: 5rem; padding-bottom: 5rem; }

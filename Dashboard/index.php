@@ -14,7 +14,7 @@ $totalLaporan = $pdo -> prepare("SELECT COUNT(*) FROM laporan_kehilangan WHERE i
 $totalLaporan -> execute([$u['id']]);
 $totalLaporan = (int)$totalLaporan -> fetchColumn();
 
-$totalResolved = $pdo -> prepare("SELECT COUNT(*) FROM laporan_kehilangan WHERE id_pelapor=? AND status='resolved'");
+$totalResolved = $pdo -> prepare("SELECT COUNT(*) FROM laporan_kehilangan WHERE id_pelapor=? AND status IN ('resolved', 'closed')");
 $totalResolved -> execute([$u['id']]);
 $totalResolved = (int)$totalResolved -> fetchColumn();
 
